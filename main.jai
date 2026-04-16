@@ -1,10 +1,22 @@
 main :: () {
     init_window();
     init_textures();
+    make_entity(.{100, 100});
     while !window.close {
+        now := seconds_since_init();
+        delta := now - time.last_time;
+        time.current_delta = cast(float)delta;
+        time.last_time = now;
+        if time.current_delta > time.max_delta {
+            time.current_delta = time.max_delta;
+            print("Big timestep encountered, clamping to %\n", time.max_delta);
+        }
+        simulate(time.current_delta);
         render();
     }
 }
+
+time: Time;
 
 Simp :: #import "Simp";
 Input :: #import "Input";
@@ -19,4 +31,11 @@ Texture :: Simp.Texture;
 #load "window.jai";
 #load "render.jai";
 #load "entities.jai";
+#load "simulate.jai";
 #load "preload_test.jai";
+
+Time :: struct {
+    last_time: float64;
+    current_delta: float32 = 0.016667;
+    max_delta: float32 = 0.15;
+}

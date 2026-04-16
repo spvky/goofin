@@ -4,7 +4,15 @@ Entity :: struct {
     map: *Texture;
 }
 
-make_entity :: () {
+entities: [..]Entity;
+
+make_entity :: (position: Vector2) {
     print("New Entity\n");
-    print("Something\n");
+    array_add(*entities, Entity.{position = position, velocity = .{10, 0}, map = *bug_tex});
+}
+
+render_entities :: () {
+    for e: entities {
+        render_sprite_centered(e.map, e.position, .{100, 100}, .{1, 1, 1, 1});
+    }
 }
