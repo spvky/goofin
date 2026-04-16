@@ -35,7 +35,21 @@ Texture :: Simp.Texture;
 #load "preload_test.jai";
 
 Time :: struct {
+    tick_rate: float = 1.0 / 100.0;
     last_time: float64;
     current_delta: float32 = 0.016667;
     max_delta: float32 = 0.15;
+}
+
+timestep_loop :: (body: Code) {
+    // t1 := f32(rl.GetTime())
+    // 		elapsed := math.min(t1 - time.t, 0.25)
+    // 
+    // 		time.t = t1
+    // 		time.simulation_time += elapsed
+    // 		for time.simulation_time >= TICK_RATE {
+    // 			// Physics stuff
+    #insert body;
+    // 			time.simulation_time -= TICK_RATE
+    // 		}
 }
