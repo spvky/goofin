@@ -1,5 +1,8 @@
 main :: () {
     init_window();
+    #if DEV_MODE {
+        editor_init();
+    }
     init_textures();
     make_entity(.{100, 100});
     while !window.close {
@@ -24,3 +27,7 @@ Texture :: Simp.Texture;
 #load "entities.jai";
 #load "simulate.jai";
 #load "preload_test.jai";
+
+#if DEV_MODE {
+    #load "editor/editor.jai";
+}

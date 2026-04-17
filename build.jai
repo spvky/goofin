@@ -28,7 +28,6 @@ EXECUTABLE_BASE_NAME := "negative-zero";
     add_build_string(tprint("DEV_MODE :: %;", dev), w);
     while true {
         message := compiler_wait_for_message();
-        print("Compiler Message: %\n", message.kind);
         if message.kind == .COMPLETE {
             mc := cast(*Message_Complete)message;
             if mc.error_code != .NONE {
