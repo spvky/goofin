@@ -1,5 +1,4 @@
 process_input :: () {
-    update_window_events();
     for event: events_this_frame {
         if event.type == .QUIT {
             window.close = true;
