@@ -39,7 +39,6 @@ process_input :: () {
         case;
         }
     }
-    // print("%: %\n", held_actions, seconds_since_init());
 }
 
 Input_Action :: enum_flags u32 {
