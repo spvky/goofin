@@ -10,9 +10,9 @@ init_textures :: () {
 
 render :: () {
     #if DEV_MODE {
-        Simp.clear_render_target(0, 1, 0, 1);
-    } else {
         Simp.clear_render_target(0.2, 0.1, 0.5, 1);
+    } else {
+        Simp.clear_render_target(0, 1, 0, 1);
     }
     #if DEV_MODE {
         render_editor_grid();
@@ -22,11 +22,10 @@ render :: () {
     render_collision_shape(aabb);
     render_square(cam_relative_position(.{0, 0}), .{10, 10});
     render_entities();
-    Simp.swap_buffers(n_window.resource);
-
     #if DEV_MODE {
         render_editor_ui();
     }
+    Simp.swap_buffers(n_window.resource);
 }
 
 load_texture_from_file :: (name: string) -> Texture, bool {

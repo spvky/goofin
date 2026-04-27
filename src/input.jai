@@ -10,6 +10,10 @@ process_input :: () {
             break;
         }
 
+				#if DEV_MODE {
+					Get_Rect.getrect_handle_event(event);
+				}
+
         if event.key_code == {
         case .ARROW_UP;
             if event.key_pressed {

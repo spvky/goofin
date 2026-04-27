@@ -7,11 +7,12 @@ main :: () {
     aabb = make_aabb(.{300, 300}, .{500, 500});
 
     init_window();
+    init_textures();
+    make_entity(.{100, 100});
+    make_entity(.{300, 250});
     #if DEV_MODE {
         editor_init();
     }
-    init_textures();
-    make_entity(.{100, 100});
     while !n_window.close {
         update_window_events();
         now := seconds_since_init();
@@ -55,6 +56,7 @@ Texture :: Simp.Texture;
 
 #if DEV_MODE {
     Get_Rect :: #import "GetRect";
+    #import "String";
     #load "editor/assets.jai";
     #load "editor/editor.jai";
     #load "editor/ui.jai";

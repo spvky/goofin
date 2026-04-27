@@ -7,6 +7,7 @@ EXECUTABLE_BASE_NAME := "negative-zero";
     // Parse args
     args := get_build_options().compile_time_command_line;
     dev := array_find(args, "-dev");
+    run := array_find(args, "-run");
     // Create Workspace
     w := compiler_create_workspace("Target workspace");
     // Set build options (just output name for now)
@@ -38,4 +39,5 @@ EXECUTABLE_BASE_NAME := "negative-zero";
     }
     compiler_end_intercept(w);
     print("\n");
+		if run Autorun.run_build_result_of_workspace(w);
 }
