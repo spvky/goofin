@@ -10,9 +10,9 @@ process_input :: () {
             break;
         }
 
-				#if DEV_MODE {
-					Get_Rect.getrect_handle_event(event);
-				}
+        #if DEV_MODE {
+            Get_Rect.getrect_handle_event(event);
+        }
 
         if event.key_code == {
         case .ARROW_UP;
@@ -54,6 +54,7 @@ Input_Action :: enum_flags u32 {
     MOVE_UP;
     MOVE_DOWN;
     JUMP;
+    EDITOR_SELECT;
 }
 
 held_actions: Input_Action;

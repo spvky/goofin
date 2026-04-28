@@ -30,6 +30,9 @@ editor_init :: () {
     my_theme = proc();
     Get_Rect.set_default_theme(my_theme);
     my_theme.text_input_theme.font = editor_assets.font;
+    my_theme.text_input_theme.alignment = .Left;
+    my_theme.text_input_theme.alignment_pad_ems = 0.3;
+    my_theme.text_input_theme.text_baseline_vertical_position = 0.1;
     my_theme.label_theme.font = editor_assets.font;
     my_theme.label_theme.alignment = .Left;
     my_theme.button_theme.font = editor_assets.font;
@@ -39,7 +42,7 @@ update_editor_selection :: () {
 }
 
 float_fmt :: (v: float32) -> FormatFloat #expand {
-    return formatFloat(v, 2, 2, zero_removal = .NO);
+    return formatFloat(v, 2, 1, zero_removal = .NO);
 }
 
 render_editor_grid :: () {

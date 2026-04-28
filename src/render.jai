@@ -53,14 +53,14 @@ render_sprite_centered :: (texture: *Texture, pos: Vector2, size: Vector2, color
     // Simp.immediate_quad(.{0, 200}, .{100, 200}, .{100, 300}, .{0, 300}, .{1, 1, 1, 1});
 }
 
-render_square :: (position: Vector2, extents: Vector2) {
+render_square :: (position: Vector2, extents: Vector2, color := Vector4.{0, 0, 0, 1}) {
     Simp.set_shader_for_color();
     he := extents * 0.5;
     p0 := position + .{-he.x, he.y};
     p1 := position + .{he.x, he.y};
     p2 := position + .{he.x, -he.y};
     p3 := position + .{-he.x, -he.y};
-    Simp.immediate_quad(p0, p1, p2, p3, .{0, 0, 0, 1});
+    Simp.immediate_quad(p0, p1, p2, p3, color);
 }
 
 angle_between :: (start: Vector2, end: Vector2) -> float32 {

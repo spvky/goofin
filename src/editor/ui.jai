@@ -28,11 +28,6 @@ render_editor_ui :: () {
     Get_Rect.add_subwindow(*inspector_subwindow, *my_theme.subwindow_theme);
 
     Get_Rect.draw_popups();
-    draw_mouse();
-}
-
-draw_mouse :: () {
-    render_square(mouse_pos(), .{50, 50});
 }
 
 mouse_pos :: () -> Vector2 {
@@ -54,24 +49,31 @@ draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *vo
     x := r.x + 20;
     y := r.y + r.h - 60;
 
+    y -= 45;
+
+    if editor_selection.mode == {
+    case .Entity;
+        inspector_subwindow.title_text = "Inspector | Entities";
+        text_extents := Vector2.{150, 35};
+
+        r1 := Get_Rect.get_rect(x, y, text_extents.x, text_extents.y);
+        // y -= 45;
+        r2 := Get_Rect.get_rect(x + 155, y, text_extents.x, text_extents.y);
+
+        ent_idx := editor_selection.selected_entity_idx;
+
+        action_a, new_text_a := Get_Rect.text_input(r1, pos_string_x, *my_theme.text_input_theme);
+        if action_a & .ENTERED modify_float_string(*pos_string_x, new_text_a, *entities[ent_idx].position.x);
+        action_b, new_text_b := Get_Rect.text_input(r2, pos_string_y, *my_theme.text_input_theme);
+        if action_b & .ENTERED modify_float_string(*pos_string_y, new_text_b, *entities[ent_idx].position.y);
+    case .Collider;
+        inspector_subwindow.title_text = "Inspector | Collision";
+    }
+
     mouse_pos := mouse_position_to_world();
-
-    pos_label := Get_Rect.get_rect(x - 10, y, 300, 80);
-    Get_Rect.label(pos_label, tprint("%", mouse_pos), *my_theme.label_theme);
-    y -= 45;
-
-    text_extents := Vector2.{max(200.0, r.w * 0.3), 40};
-
-    r1 := Get_Rect.get_rect(x, y, text_extents.x, text_extents.y);
-    y -= 45;
-    r2 := Get_Rect.get_rect(x, y, text_extents.x, text_extents.y);
-
-    action_a, new_text_a := Get_Rect.text_input(r1, pos_string_x, *my_theme.text_input_theme);
-    if action_a & .ENTERED modify_float_string(*pos_string_x, new_text_a, *entities[0].position.x);
-    action_b, new_text_b := Get_Rect.text_input(r2, pos_string_y, *my_theme.text_input_theme);
-    if action_b & .ENTERED modify_float_string(*pos_string_y, new_text_b, *entities[0].position.y);
-
-    // vec2_input_field(.{500,500},.{200,100}, *pos_string_x, *pos_string_y, *entities[0].position);
+    pos_label := Get_Rect.get_rect(r.x - 10, r.y - 20, 400, 80);
+    mouse_x, mouse_y := float_fmt(mouse_pos.x), float_fmt(mouse_pos.y);
+    Get_Rect.label(pos_label, tprint("{%, %}", mouse_x, mouse_y), *my_theme.label_theme);
 }
 
 modify_float_string :: (ps: *string, new_value: string, value_ptr: *float32) {
