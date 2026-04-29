@@ -7,11 +7,21 @@ Editor_Selection :: struct {
     mode: Editor_Selection_Mode;
     selected_collider_idx: u32;
     selected_entity_idx: u32;
+    entity_data: Editor_Entity_Data;
+    #overlay (entity_data) collider_data: Editor_Entity_Data;
 }
 
 Editor_Selection_Mode :: enum {
     Entity :: 0;
     Collider :: 1;
+}
+
+Editor_Entity_Data :: struct {
+    held_entity := false;
+    held_entity_idx: u32;
+}
+
+Editor_Collider_Data :: struct {
 }
 
 editor_selection: Editor_Selection;
@@ -20,9 +30,10 @@ editor_init :: () {
     load_editor_assets();
     Get_Rect.ui_init();
     some_string = copy_string("Cool guy");
-    a := formatFloat(entities[0].position.x, 2, 2, zero_removal = .NO);
-    pos_string_x = sprint("%", float_fmt(entities[0].position.x));
-    pos_string_y = sprint("%", float_fmt(entities[0].position.y));
+    x := formatFloat(entities[0].position.x, 2, 2, zero_removal = .NO);
+    y := formatFloat(entities[0].position.y, 2, 2, zero_removal = .NO);
+    pos_string_x = sprint("%", x);
+    pos_string_y = sprint("%", y);
     pos_string_2_x = sprint("%", entities[1].position.x);
     pos_string_2_y = sprint("%", entities[1].position.y);
 

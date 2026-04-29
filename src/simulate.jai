@@ -17,4 +17,7 @@ simulate :: (delta: float32) {
     for *e: entities {
         e.position += e.velocity * delta;
     }
+    #if DEV_MODE {
+        entity_picking();
+    }
 }

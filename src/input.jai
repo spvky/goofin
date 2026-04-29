@@ -39,6 +39,12 @@ process_input :: () {
             } else {
                 held_actions &= ~.CAM_RIGHT;
             }
+        case .MOUSE_BUTTON_LEFT;
+            if event.key_pressed {
+                held_actions |= .EDITOR_SELECT;
+            } else {
+                held_actions &= ~.EDITOR_SELECT;
+            }
         case;
         }
     }
