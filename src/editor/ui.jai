@@ -53,6 +53,7 @@ draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *vo
 
     if editor_selection.mode == {
     case .Entity;
+        data := *editor_selection.entity_data;
         inspector_subwindow.title_text = "Inspector | Entities";
         text_extents := Vector2.{150, 35};
 
@@ -62,10 +63,17 @@ draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *vo
 
         ent_idx := editor_selection.selected_entity_idx;
 
-        action_a, new_text_a := Get_Rect.text_input(r1, pos_string_x, *my_theme.text_input_theme);
+        action_a, new_text_a, state := Get_Rect.text_input(r1, pos_string_x, *my_theme.text_input_theme);
+        pos_x_input_state = state.*;
+        print("State String: %\n", state.text);
         if action_a & .ENTERED modify_float_string(*pos_string_x, new_text_a, *entities[ent_idx].position.x);
         action_b, new_text_b := Get_Rect.text_input(r2, pos_string_y, *my_theme.text_input_theme);
-        if action_b & .ENTERED modify_float_string(*pos_string_y, new_text_b, *entities[ent_idx].position.y);
+        if action_b & .ENTERED {
+            print("Entered\n");
+            modify_float_string(*pos_string_y, new_text_b, *entities[ent_idx].position.y);
+            entity := *entities[data.held_entity_idx];
+            set_entity_inspector_strings(entity);
+        }
     case .Collider;
         inspector_subwindow.title_text = "Inspector | Collision";
     }
@@ -80,9 +88,7 @@ modify_float_string :: (ps: *string, new_value: string, value_ptr: *float32) {
     new_float, ok := parse_float(*new_value);
     assert(ok, "Invalid float parsed when modifying a float string");
     new_string := tprint("%", float_fmt(new_float));
-    print("New String: %\n", new_string);
     free(ps.*);
     ps.* = copy_string(new_string);
-    print("PString: %\n", ps.*);
     value_ptr.* = new_float;
 }

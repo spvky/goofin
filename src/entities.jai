@@ -28,11 +28,21 @@ render_entities :: () {
 }
 
 #if DEV_MODE {
-    set_entity_inspector_fields :: (entity: *Entity) {
+    set_entity_inspector_strings :: (entity: *Entity) {
         x := formatFloat(entity.position.x, 2, 2, zero_removal = .NO);
         y := formatFloat(entity.position.y, 2, 2, zero_removal = .NO);
-        pos_string_x = sprint("%", x);
-        pos_string_y = sprint("%", y);
+        new_pos_string_x := tprint("%", x);
+        modify_float_string(*pos_string_x, new_pos_string_x, *entity.position.x);
+        print("Pre-State String: %\n", pos_x_input_state.text);
+        // str_ptr := *pos_x_input_state.text;
+        // str_ptr.* = copy_string(new_pos_string_x);
+        // print("%\n", !*pos_x_input_state);
+        if !*pos_x_input_state != false {
+            Get_Rect.set_input(*pos_x_input_state, new_pos_string_x);
+        }
+        print("Post-State String: %\n", pos_x_input_state.text);
+        new_pos_string_y := tprint("%", y);
+        modify_float_string(*pos_string_y, new_pos_string_y, *entity.position.y);
     }
 
     entity_picking :: () {
@@ -50,12 +60,12 @@ render_entities :: () {
                 }
             } else {
                 data.held_entity = false;
-                set_entity_inspector_fields(*entities[data.held_entity_idx]);
+                set_entity_inspector_strings(*entities[data.held_entity_idx]);
             }
             if data.held_entity {
                 entity := *entities[data.held_entity_idx];
                 entity.position = pos;
-                set_entity_inspector_fields(entity);
+                set_entity_inspector_strings(entity);
             }
         }
     }

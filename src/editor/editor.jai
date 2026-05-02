@@ -1,8 +1,3 @@
-inspector_subwindow := Get_Rect.Subwindow_Info.{
-                                                rect = #run Get_Rect.get_rect(600, 200, 400, 600),
-                                                draw = draw_inspector,
-                                                title_text = "Inspector"};
-
 Editor_Selection :: struct {
     mode: Editor_Selection_Mode;
     selected_collider_idx: u32;
@@ -21,10 +16,13 @@ Editor_Entity_Data :: struct {
     held_entity_idx: u32;
 }
 
-Editor_Collider_Data :: struct {
-}
+pos_x_input_state: Get_Rect.Text_Input_State;
 
 editor_selection: Editor_Selection;
+inspector_subwindow := Get_Rect.Subwindow_Info.{
+                                                rect = #run Get_Rect.get_rect(600, 200, 400, 600),
+                                                draw = draw_inspector,
+                                                title_text = "Inspector"};
 
 editor_init :: () {
     load_editor_assets();
