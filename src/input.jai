@@ -5,7 +5,6 @@ process_input :: () {
             break;
         }
 
-
         #if DEV_MODE {
             Get_Rect.getrect_handle_event(event);
         }

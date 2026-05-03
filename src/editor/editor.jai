@@ -16,8 +16,6 @@ Editor_Entity_Data :: struct {
     held_entity_idx: u32;
 }
 
-pos_x_input_state: Get_Rect.Text_Input_State;
-
 editor_selection: Editor_Selection;
 inspector_subwindow := Get_Rect.Subwindow_Info.{
                                                 rect = #run Get_Rect.get_rect(600, 200, 400, 600),
@@ -38,9 +36,6 @@ editor_init :: () {
     my_theme.label_theme.font = editor_assets.font;
     my_theme.label_theme.alignment = .Left;
     my_theme.button_theme.font = editor_assets.font;
-}
-
-update_editor_selection :: () {
 }
 
 float_fmt :: (v: float32) -> FormatFloat #expand {

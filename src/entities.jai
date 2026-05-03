@@ -50,4 +50,13 @@ render_entities :: () {
             }
         }
     }
+
+    write_entities_to_file :: () {
+        file, success := file_open("assets/entities.ent", true);
+        assert(success, "Failed to open entities file for writing!\n");
+        defer file_close(*file);
+
+        file_write(*file, *entities.count, size_of(s64));
+        file_write(*file, *entities.data, size_of(Entity) * entities.count);
+    }
 }
