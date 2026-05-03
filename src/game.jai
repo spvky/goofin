@@ -2,6 +2,9 @@ tri: Collision_Shape;
 poly: Collision_Shape;
 aabb: Collision_Shape;
 
+getrect_captured_mouse: bool;
+getrect_captured_keyboard: bool;
+
 main :: () {
     tri = make_tri(.[.{50, 200}, .{50, 400}, .{200, 200}]);
     aabb = make_aabb(.{300, 300}, .{500, 500});
@@ -26,6 +29,7 @@ main :: () {
         // timestep(#code simulate(tickrate()));
         render();
         Collider;
+        reset_temporary_storage();
     }
 }
 

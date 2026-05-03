@@ -27,13 +27,6 @@ inspector_subwindow := Get_Rect.Subwindow_Info.{
 editor_init :: () {
     load_editor_assets();
     Get_Rect.ui_init();
-    some_string = copy_string("Cool guy");
-    x := formatFloat(entities[0].position.x, 2, 2, zero_removal = .NO);
-    y := formatFloat(entities[0].position.y, 2, 2, zero_removal = .NO);
-    pos_string_x = sprint("%", x);
-    pos_string_y = sprint("%", y);
-    pos_string_2_x = sprint("%", entities[1].position.x);
-    pos_string_2_y = sprint("%", entities[1].position.y);
 
     proc := Get_Rect.default_theme_procs[current_theme];
     my_theme = proc();
