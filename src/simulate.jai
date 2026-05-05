@@ -14,10 +14,13 @@ simulate :: (delta: float32) {
         cam_delta.x += 1;
     }
     camera.target += cam_delta * delta * 100;
-    for *e: entities {
-        e.position += e.velocity * delta;
+    for *t: debug_room_things {
+        if t.kind == .CHARACTER {
+            td := t.character_data;
+            t.position += td.velocity * delta;
+        }
     }
     #if DEV_MODE {
-        entity_picking();
+        thing_editor_picking(*debug_room_things);
     }
 }

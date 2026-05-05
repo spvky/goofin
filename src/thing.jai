@@ -140,13 +140,42 @@ render_single_thing :: (thing: *Thing) {
 }
 
 render_things_in_room :: (tm: Thing_Room_Manager) {
-    // print("Things Next Free: %\n", tm.next_free);
-    // print("3rd Thing: %\n", tm.things[2]);
-    // print("Things Used: %\n", tm.used);
     for thing, i: tm {
-        if tm.used[i] {
-            // print("Thing: %\n", thing);
-        }
+        pos := cam_relative_position(thing.position);
         render_single_thing(*thing);
+        #if DEV_MODE {
+            if editor_selection.mode == .Entity {
+                color := Vector4.{1, 1, 1, 1};
+                if i == xx editor_selection.selected_entity_idx {
+                    color = Vector4.{1, 0, 0, 0};
+                }
+                render_square(pos, .{10, 10}, color);
+            }
+        }
+    }
+}
+
+#if DEV_MODE {
+    thing_editor_picking :: (tm: *Thing_Room_Manager) {
+        if editor_selection.mode == .Entity {
+            pos := mouse_position_to_world();
+            data := *editor_selection.entity_data;
+            if is_action_pressed(.EDITOR_SELECT) {
+                for thing, i: tm {
+                    if distance(pos, thing.position) < 30 && !data.held_entity {
+                        data.held_entity = true;
+                        data.held_entity_idx = xx i;
+                        editor_selection.selected_entity_idx = xx i;
+                        break;
+                    }
+                }
+            } else {
+                data.held_entity = false;
+            }
+            if data.held_entity {
+                thing := get_thing_ptr(tm, data.held_entity_idx);
+                thing.position = pos;
+            }
+        }
     }
 }
