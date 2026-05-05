@@ -8,8 +8,8 @@ Collision_Shape :: struct {
 }
 
 Collision_Shape_Kind :: enum {
-    Triangle;
-    Polygon;
+    TRIANGLE;
+    POLYGON;
     AABB;
 }
 
@@ -56,14 +56,14 @@ make_aabb :: (min: Vector2, max: Vector2) -> Collision_Shape {
 
 make_tri :: (points: [3]Vector2) -> Collision_Shape {
     tri: Collision_Shape;
-    tri.kind = .Triangle;
+    tri.kind = .TRIANGLE;
     tri.triangle_verts = points;
     return tri;
 }
 
 make_poly :: (points: [4]Vector2) -> Collision_Shape {
     poly: Collision_Shape;
-    poly.kind = .Polygon;
+    poly.kind = .POLYGON;
     poly.polygon_verts = points;
     return poly;
 }
@@ -71,13 +71,13 @@ make_poly :: (points: [4]Vector2) -> Collision_Shape {
 render_collision_shape :: (s: Collision_Shape) {
     Simp.set_shader_for_color();
     if s.kind == {
-    case .Triangle;
+    case .TRIANGLE;
         p0 := cam_relative_position(s.triangle_verts[0]);
         p1 := cam_relative_position(s.triangle_verts[1]);
         p2 := cam_relative_position(s.triangle_verts[2]);
         Simp.immediate_quad(p0, p0, p1, p2, .{0, 0.7, 0, 1});
 
-    case .Polygon;
+    case .POLYGON;
         p0 := cam_relative_position(s.polygon_verts[0]);
         p1 := cam_relative_position(s.polygon_verts[1]);
         p2 := cam_relative_position(s.polygon_verts[2]);

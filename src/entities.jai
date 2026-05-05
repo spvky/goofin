@@ -4,6 +4,16 @@ Entity :: struct {
     map: *Texture;
 }
 
+Entity_Data :: struct {
+    velocity: Vector2;
+    map: *Texture;
+}
+
+Entity_Types :: enum {
+    ACTOR :: 0;
+    COLLISION :: 1;
+}
+
 entities: [..]Entity;
 
 make_entity :: (position: Vector2) {

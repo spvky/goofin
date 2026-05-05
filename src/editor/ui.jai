@@ -54,10 +54,9 @@ draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *vo
         r2 := Get_Rect.get_rect(x + 155, y, text_extents.x, text_extents.y);
 
         ent_idx := editor_selection.selected_entity_idx;
-        entity := *entities[ent_idx];
+        entity := get_thing_ptr(*debug_room_things, ent_idx);
 
-        // a scope to prevent copy/paste errors
-        {
+        /* a scope to prevent copy/paste errors */ {
             x_str := tprint("%", formatFloat(entity.position.x, 2, 2, zero_removal = .NO));
             action_x, new_text_x, state_x := Get_Rect.text_input(r1, x_str, *my_theme.text_input_theme);
             if action_x & .ENTERED {
@@ -70,8 +69,7 @@ draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *vo
             }
         }
 
-        // a scope to prevent copy/paste errors (e.g. using "x_str" by accident)
-        {
+        /* a scope to prevent copy/paste errors */ {
             y_str := tprint("%", formatFloat(entity.position.y, 2, 2, zero_removal = .NO));
             action_y, new_text_y, state_y := Get_Rect.text_input(r2, y_str, *my_theme.text_input_theme);
             if action_y & .ENTERED {

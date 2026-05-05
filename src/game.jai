@@ -11,11 +11,18 @@ main :: () {
 
     init_window();
     init_textures();
-    make_entity(.{100, 100});
-    make_entity(.{300, 250});
+    // make_entity(.{100, 100});
+    // make_entity(.{300, 250});
+    bug1 := make_character(.{100, 100});
+    bug2 := make_character(.{300, 250});
+    bug3 := make_character(.{600, 250});
+    add_thing(*debug_room_things, bug1);
+    add_thing(*debug_room_things, bug2);
+    add_thing(*debug_room_things, bug3);
     #if DEV_MODE {
         editor_init();
     }
+    print("Thing Size: %\n", size_of(Thing));
     while !n_window.close {
         update_window_events();
         now := seconds_since_init();
@@ -28,7 +35,6 @@ main :: () {
         simulate(current_dt);
         // timestep(#code simulate(tickrate()));
         render();
-        Collider;
         reset_temporary_storage();
     }
 }
@@ -39,6 +45,7 @@ DT_MAX: float: 0.15;
 Simp :: #import "Simp";
 Input :: #import "Input";
 Texture :: Simp.Texture;
+Get_Rect :: #import "GetRect";
 
 #import "Basic";
 #import "Math";
@@ -52,6 +59,7 @@ Texture :: Simp.Texture;
 #load "render.jai";
 #load "camera.jai";
 #load "entities.jai";
+#load "thing.jai";
 #load "simulate.jai";
 #load "input.jai";
 #load "player.jai";
@@ -59,7 +67,6 @@ Texture :: Simp.Texture;
 #load "preload_test.jai";
 
 #if DEV_MODE {
-    Get_Rect :: #import "GetRect";
     #import "String";
     #load "editor/assets.jai";
     #load "editor/editor.jai";

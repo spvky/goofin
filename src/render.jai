@@ -18,10 +18,11 @@ render :: () {
         render_editor_grid();
     }
     // Draw Scene
-    render_collision_shape(tri);
-    render_collision_shape(aabb);
-    render_square(cam_relative_position(.{0, 0}), .{10, 10});
-    render_entities();
+    // render_collision_shape(tri);
+    // render_collision_shape(aabb);
+    // render_square(cam_relative_position(.{0, 0}), .{10, 10});
+    // render_entities();
+    render_things_in_room(debug_room_things);
     #if DEV_MODE {
         render_editor_ui();
     }
