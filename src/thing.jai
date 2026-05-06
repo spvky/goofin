@@ -144,12 +144,11 @@ render_things_in_room :: (tm: Thing_Room_Manager) {
         pos := cam_relative_position(thing.position);
         render_single_thing(*thing);
         #if DEV_MODE {
-            if editor_selection.mode == .Entity {
-                color := Vector4.{1, 1, 1, 1};
-                if i == xx editor_selection.selected_entity_idx {
-                    color = Vector4.{1, 0, 0, 0};
-                }
-                render_square(pos, .{10, 10}, color);
+            selected_entity := i == xx editor_selection.selected_entity_idx;
+            if selected_entity {
+                render_square(pos, .{10, 10}, .{1, 0, 0, 1});
+            } else if !selected_entity && !editor_selection.locked {
+                render_square(pos, .{10, 10}, .{1, 1, 1, 1});
             }
         }
     }
@@ -157,10 +156,11 @@ render_things_in_room :: (tm: Thing_Room_Manager) {
 
 #if DEV_MODE {
     thing_editor_picking :: (tm: *Thing_Room_Manager) {
-        if editor_selection.mode == .Entity {
-            pos := mouse_position_to_world();
-            data := *editor_selection.entity_data;
-            if is_action_pressed(.EDITOR_SELECT) {
+        pos := mouse_position_to_world();
+        data := *editor_selection.entity_data;
+        if is_action_pressed(.EDITOR_SELECT) {
+            if editor_selection.locked {
+            } else {
                 for thing, i: tm {
                     if distance(pos, thing.position) < 30 && !data.held_entity {
                         data.held_entity = true;
@@ -169,13 +169,13 @@ render_things_in_room :: (tm: Thing_Room_Manager) {
                         break;
                     }
                 }
-            } else {
-                data.held_entity = false;
             }
-            if data.held_entity {
-                thing := get_thing_ptr(tm, data.held_entity_idx);
-                thing.position = pos;
-            }
+        } else {
+            data.held_entity = false;
+        }
+        if data.held_entity {
+            thing := get_thing_ptr(tm, data.held_entity_idx);
+            thing.position = pos;
         }
     }
 }
