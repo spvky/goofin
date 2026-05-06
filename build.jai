@@ -34,13 +34,19 @@ EXECUTABLE_BASE_NAME := "negative-zero";
             typechecked := cast(*Message_Typechecked)message;
             for checked: typechecked.structs {
                 struct_info := checked.expression.defined_type;
-                // first_5: string;
-                // first_5 = copy_string(struct_info.name);
-                // first_5.count = 5;
-                // is_thing_data := "Thing" == first_5;
-                // if is_thing_data {
-                //     print("% checked\n", struct_info.name);
-                // }
+                notes := checked.expression.notes;
+                is_thing_data: bool;
+                print("% notes for %\n", notes.count, struct_info.name);
+                // Look in how to for how to check typchecking at the end after notes have been read
+                for n: notes {
+                    print("Note %\n", n);
+                    // if n == "thing_data" {
+                    //     is_thing_data = true;
+                    // }
+                }
+                if is_thing_data {
+                    print("% checked\n", struct_info.name);
+                }
             }
         case .COMPLETE;
             mc := cast(*Message_Complete)message;
