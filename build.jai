@@ -29,7 +29,20 @@ EXECUTABLE_BASE_NAME := "negative-zero";
     add_build_string(tprint("DEV_MODE :: %;", dev), w);
     while true {
         message := compiler_wait_for_message();
-        if message.kind == .COMPLETE {
+        if message.kind == {
+        case .TYPECHECKED;
+            typechecked := cast(*Message_Typechecked)message;
+            for checked: typechecked.structs {
+                struct_info := checked.expression.defined_type;
+                // first_5: string;
+                // first_5 = copy_string(struct_info.name);
+                // first_5.count = 5;
+                // is_thing_data := "Thing" == first_5;
+                // if is_thing_data {
+                //     print("% checked\n", struct_info.name);
+                // }
+            }
+        case .COMPLETE;
             mc := cast(*Message_Complete)message;
             if mc.error_code != .NONE {
                 exit(1);
@@ -39,5 +52,5 @@ EXECUTABLE_BASE_NAME := "negative-zero";
     }
     compiler_end_intercept(w);
     print("\n");
-		if run Autorun.run_build_result_of_workspace(w);
+    if run Autorun.run_build_result_of_workspace(w);
 }

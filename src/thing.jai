@@ -3,8 +3,8 @@ MAX_THINGS_PER_ROOM :: 128;
 Thing :: struct {
     using position: Vector2;
     kind: Thing_Kind;
-    collision_data: Collision_Data;
-    #overlay (collision_data) character_data: Character_Data;
+    collision_data: Thing_Collision;
+    #overlay (collision_data) character_data: Thing_Character;
 }
 
 Thing_Room_Manager :: struct {
@@ -52,18 +52,19 @@ Thing_Kind :: enum {
     COLLISION :: 2;
 }
 
-Character_Data :: struct {
-    velocity: Vector2;
-    size := Vector2.{100, 100};
+Thing_Character :: struct {
+    velocity: Vector2; @editor_display
+    size := Vector2.{100, 100}; @editor_display
     map: *Texture;
 }
 
-Collision_Data :: struct {
+Thing_Collision :: struct {
     kind: Collision_Shape_Kind;
     is_sensor := false;
-    polygon_verts: [4]Vector2;
-    #overlay (polygon_verts) aabb_extents: [2]Vector2;
-    #overlay (polygon_verts) triangle_verts: [3]Vector2;
+    verts: void;
+    polygon_verts: [4]Vector2; @editor_display
+    #overlay (polygon_verts) aabb_extents: [2]Vector2; @editor_display
+    #overlay (polygon_verts) triangle_verts: [3]Vector2; @editor_display
 }
 
 Character_Kind :: enum {
@@ -103,9 +104,9 @@ make_character :: (position := Vector2.{0, 0}, velocity := Vector2.{0, 0}, chara
     case .BUG;
         map = *bug_tex;
     }
-    thing.character_data = Character_Data.{
-                                           velocity = velocity,
-                                           map = map};
+    thing.character_data = Thing_Character.{
+                                            velocity = velocity,
+                                            map = map};
     return thing;
 }
 

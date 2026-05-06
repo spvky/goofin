@@ -67,7 +67,5 @@ Get_Rect :: #import "GetRect";
 
 #if DEV_MODE {
     #import "String";
-    #load "editor/assets.jai";
-    #load "editor/editor.jai";
-    #load "editor/ui.jai";
+    #load "dev/editor.jai";
 }
