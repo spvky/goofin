@@ -55,7 +55,8 @@ EXECUTABLE_BASE_NAME := "negative-zero";
                     if equal(note.text, "thing_data") {
                         print("%\n", s.expression.defined_type.name);
                         for member: s.expression.defined_type.members {
-                            print("%: %\nNotes: %\n\n", member.name, member.type.*, member.notes);
+                            member_type: Type = (cast(*Type)(*member.type)).*;
+                            print("%: %\nNotes: %\n\n", member.name, member_type, member.notes);
                         }
                     }
                 }
