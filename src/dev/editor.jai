@@ -174,3 +174,12 @@ load_editor_assets :: () {
     editor_assets.font = Simp.get_font_at_size("assets/fonts", "dungeon-mode.ttf", 24);
     assert(editor_assets.font != null);
 }
+
+/* 
+Comptime notes
+When inspecting thing fields:
+{ARRAY,16} = [2]Vector2;
+{ARRAY,24} = [3]Vector2;
+{ARRAY,32} = [4]Vector2;
+{STRUCT, 8} = Vector2;
+*/
