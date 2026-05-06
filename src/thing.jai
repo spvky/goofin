@@ -52,20 +52,20 @@ Thing_Kind :: enum {
     COLLISION :: 2;
 }
 
-Character_Data :: struct {
+Character_Data :: struct @thing_data {
     velocity: Vector2; @editor_display
     size := Vector2.{100, 100}; @editor_display
     map: *Texture;
-} @thing_data;
+}
 
-Collision_Data :: struct {
+Collision_Data :: struct @thing_data {
     kind: Collision_Shape_Kind;
     is_sensor := false;
     verts: void;
     polygon_verts: [4]Vector2; @editor_display
     #overlay (polygon_verts) aabb_extents: [2]Vector2; @editor_display
     #overlay (polygon_verts) triangle_verts: [3]Vector2; @editor_display
-} @thing_data;
+}
 
 Character_Kind :: enum {
     BUG :: 0;
