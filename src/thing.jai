@@ -144,6 +144,7 @@ render_things_in_room :: (tm: Thing_Room_Manager) {
         pos := cam_relative_position(thing.position);
         render_single_thing(*thing);
         #if DEV_MODE {
+            // If selected entity is a collider, highlight the points here
             selected_entity := i == xx editor_selection.selected_entity_idx;
             if selected_entity {
                 render_square(pos, .{10, 10}, .{1, 0, 0, 1});
@@ -160,6 +161,7 @@ render_things_in_room :: (tm: Thing_Room_Manager) {
         data := *editor_selection.entity_data;
         if is_action_pressed(.EDITOR_SELECT) {
             if editor_selection.locked {
+                // Do moving collision points here
             } else {
                 for thing, i: tm {
                     if distance(pos, thing.position) < 30 && !data.held_entity {

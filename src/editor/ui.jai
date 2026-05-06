@@ -33,6 +33,7 @@ mouse_position_to_world :: () -> Vector2 {
 }
 
 draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
+    // Add unique fields here based on the type of thing selected, could be fun to define notes on the data fields and find a way to render the fields procedurally instead of placing each text input manually
     ent_idx := editor_selection.selected_entity_idx;
     entity := get_thing_ptr(*debug_room_things, ent_idx);
 
