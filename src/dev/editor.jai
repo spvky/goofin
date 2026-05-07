@@ -175,39 +175,39 @@ load_editor_assets :: () {
     assert(editor_assets.font != null);
 }
 
-vector2_text_input :: (x: *float32, y: *float32, value_ptr: *Vector2, index: *u8) {
-    text_extents := Vector2.{150, 35};
-    r1 := Get_Rect.get_rect(x, y, text_extents.x, text_extents.y);
-    r2 := Get_Rect.get_rect(x + 155, y, text_extents.x, text_extents.y);
-
-    /* a scope to prevent copy/paste errors */{
-        x_str := tprint("%", formatFloat(value_ptr.x, 2, 0, zero_removal = .NO));
-        // add index here to avoid rewrite
-        action_x, new_text_x, state_x := Get_Rect.text_input(r1, x_str, *my_theme.text_input_theme);
-        if action_x & .ENTERED {
-            if modify_float_from_string(*value_ptr.x, new_text_x) {
-                new_x_str := tprint("%", formatFloat(value_ptr.x, 2, 2, zero_removal = .NO));
-            }
-        }
-        if !state_x.active {
-            Get_Rect.reset(state_x);
-        }
-    }
-
-    /* a scope to prevent copy/paste errors */{
-        y_str := tprint("%", formatFloat(value_ptr.y, 2, 2, zero_removal = .NO));
-        // add index here to avoid rewrite
-        action_y, new_text_y, state_y := Get_Rect.text_input(r2, y_str, *my_theme.text_input_theme);
-        if action_y & .ENTERED {
-            if modify_float_from_string(*value_ptr.y, new_text_y) {
-                new_y_str := tprint("%", formatFloat(value_ptr.y, 2, 2, zero_removal = .NO));
-            }
-        }
-        if !state_y.active {
-            Get_Rect.reset(state_y);
-        }
-    }
-}
+// vector2_text_input :: (x: *float32, y: *float32, value_ptr: *Vector2, index: *u8) {
+//     text_extents := Vector2.{150, 35};
+//     r1 := Get_Rect.get_rect(x, y, text_extents.x, text_extents.y);
+//     r2 := Get_Rect.get_rect(x + 155, y, text_extents.x, text_extents.y);
+// 
+//     /* a scope to prevent copy/paste errors */{
+//         x_str := tprint("%", formatFloat(value_ptr.x, 2, 0, zero_removal = .NO));
+//         // add index here to avoid rewrite
+//         action_x, new_text_x, state_x := Get_Rect.text_input(r1, x_str, *my_theme.text_input_theme);
+//         if action_x & .ENTERED {
+//             if modify_float_from_string(*value_ptr.x, new_text_x) {
+//                 new_x_str := tprint("%", formatFloat(value_ptr.x, 2, 2, zero_removal = .NO));
+//             }
+//         }
+//         if !state_x.active {
+//             Get_Rect.reset(state_x);
+//         }
+//     }
+// 
+//     /* a scope to prevent copy/paste errors */{
+//         y_str := tprint("%", formatFloat(value_ptr.y, 2, 2, zero_removal = .NO));
+//         // add index here to avoid rewrite
+//         action_y, new_text_y, state_y := Get_Rect.text_input(r2, y_str, *my_theme.text_input_theme);
+//         if action_y & .ENTERED {
+//             if modify_float_from_string(*value_ptr.y, new_text_y) {
+//                 new_y_str := tprint("%", formatFloat(value_ptr.y, 2, 2, zero_removal = .NO));
+//             }
+//         }
+//         if !state_y.active {
+//             Get_Rect.reset(state_y);
+//         }
+//     }
+// }
 
 /*
 Comptime notes
