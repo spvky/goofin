@@ -175,7 +175,7 @@ load_editor_assets :: () {
     assert(editor_assets.font != null);
 }
 
-vector2_text_input :: (x: float32, y: float32, value_ptr: *Vector2, index: *u8) {
+vector2_text_input :: (x: *float32, y: *float32, value_ptr: *Vector2, index: *u8) {
     text_extents := Vector2.{150, 35};
     r1 := Get_Rect.get_rect(x, y, text_extents.x, text_extents.y);
     r2 := Get_Rect.get_rect(x + 155, y, text_extents.x, text_extents.y);
@@ -224,12 +224,30 @@ Editor_Vector_2_Field :: struct {
 	
 }
 
-Editor_Character_Data ::  {
-	position_x_string: string;
-	position_y_string: string;
-	value_ptr: *T;
-	member_type: Vector2;
+Editor_Display_Field ::  {
+	field_name: string,
+	field_type: Type,
+	display_proc: proc();
 }
+
+write the procs from comptime
+
+a :: (edf: *Editor_Display_Field) {
+	field_offset: int
+	if edf.field_type == {
+		case Vector2;
+		case float32;
+	}
+	case on type
+	vector2_text_input (x: *float32, y: *float32>)
+}
+
+Editor
+
+What data would need to be created to render the editors
+
+
+
 
 
 */
