@@ -174,12 +174,56 @@ load_editor_assets :: () {
     editor_assets.font = Simp.get_font_at_size("assets/fonts", "dungeon-mode.ttf", 24);
     assert(editor_assets.font != null);
 }
+/*
+Vector2 input proc
+vector2_text_input :: (value_ptr: *Vector2) {
+    /* a scope to prevent copy/paste errors */{
+        x_str := tprint("%", formatFloat(entity.position.x, 2, 2, zero_removal = .NO));
+        action_x, new_text_x, state_x := Get_Rect.text_input(r1, x_str, *my_theme.text_input_theme);
+        if action_x & .ENTERED {
+            if modify_float_from_string(*entity.position.x, new_text_x) {
+                new_x_str := tprint("%", formatFloat(entity.position.x, 2, 2, zero_removal = .NO));
+            }
+        }
+        if !state_x.active {
+            Get_Rect.reset(state_x);
+        }
+    }
 
-/* 
+    /* a scope to prevent copy/paste errors */{
+        y_str := tprint("%", formatFloat(entity.position.y, 2, 2, zero_removal = .NO));
+        action_y, new_text_y, state_y := Get_Rect.text_input(r2, y_str, *my_theme.text_input_theme);
+        if action_y & .ENTERED {
+            if modify_float_from_string(*entity.position.y, new_text_y) {
+                new_y_str := tprint("%", formatFloat(entity.position.y, 2, 2, zero_removal = .NO));
+            }
+        }
+        if !state_y.active {
+            Get_Rect.reset(state_y);
+        }
+    }
+}
+
 Comptime notes
 When inspecting thing fields:
 {ARRAY,16} = [2]Vector2;
 {ARRAY,24} = [3]Vector2;
 {ARRAY,32} = [4]Vector2;
 {STRUCT, 8} = Vector2;
+
+editor_vector_2_field :: () {
+}
+
+Editor_Vector_2_Field :: struct {
+	
+}
+
+Editor_Character_Data ::  {
+	position_x_string: string;
+	position_y_string: string;
+	value_ptr: *T;
+	member_type: Vector2;
+}
+
+
 */
