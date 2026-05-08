@@ -118,6 +118,7 @@ draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *vo
 
     label_extents := Vector2.{600, 35};
     text_extents := Vector2.{150, 35};
+    field_index: s64;
 
     draw_character_data_fields();
 
@@ -128,6 +129,7 @@ draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *vo
 }
 
 modify_float_from_string :: (value_ptr: *float32, float_str: string) -> success: bool {
+    print("MODIFYIN'\n");
     new_value, ok := parse_float(*float_str);
     if ok {
         value_ptr.* = new_value;

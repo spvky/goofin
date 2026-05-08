@@ -29,9 +29,9 @@ VECTOR2_INPUT_STRING :: #string END
 		x_str := float_str(`entity.%1.x);
 		action_x, new_text_x, state_x := Get_Rect.text_input(%1_x_rect, x_str, *my_theme.text_input_theme);
 		if action_x & .ENTERED {
-				// if modify_float_from_string(*`entity.%1.x, new_text_x) {
-				// 		new_x_str := float_str(`entity.%1.x);
-				// }
+				if modify_float_from_string(*`entity.%1.x, new_text_x) {
+						new_x_str := float_str(`entity.%1.x);
+				}
 		}
 		if !state_x.active {
 				Get_Rect.reset(state_x);

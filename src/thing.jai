@@ -15,11 +15,11 @@ Thing_Room_Manager :: struct {
 
 debug_room_things: Thing_Room_Manager;
 
-for_expansion :: (tm: Thing_Room_Manager, body: Code, flags: For_Flags) #expand {
+for_expansion :: (tm: *Thing_Room_Manager, body: Code, flags: For_Flags) #expand {
     for ok, i: tm.used {
         if !ok continue;
         `it_index := i;
-        `it := tm.things[i];
+        `it := *tm.things[i];
         #insert body;
     }
 }
@@ -150,7 +150,7 @@ render_single_thing :: (thing: *Thing) {
 render_things_in_room :: (tm: Thing_Room_Manager) {
     for thing, i: tm {
         pos := cam_relative_position(thing.position);
-        render_single_thing(*thing);
+        render_single_thing(thing);
         #if DEV_MODE {
             // If selected entity is a collider, highlight the points here
             selected_entity := i == xx editor_selection.selected_entity_idx;
@@ -161,24 +161,13 @@ render_things_in_room :: (tm: Thing_Room_Manager) {
             }
         }
     }
-
-    for o: orbs {
-        render_square(o.pos, .{100, 100}, .{0, 0, 1, 1});
-    }
 }
 
 apply_thing_velocity :: (delta: float32) {
     for *t: debug_room_things {
         if t.kind == .CHARACTER {
-            if t.velocity.x > 0.0 {
-                print("Pre:\n\tPos: %\n\tVelo: %\n", t.position, t.velocity);
-                t.position += t.velocity * delta;
-                print("Post:\n\tPos: %\n\tVelo: %\n", t.position, t.velocity);
-            }
+            t.position += t.velocity * delta;
         }
-    }
-    for *o: orbs {
-        o.pos += o.velo * delta;
     }
 }
 

@@ -4,19 +4,6 @@ aabb: Collision_Shape;
 
 getrect_captured_mouse: bool;
 getrect_captured_keyboard: bool;
-orbs := Fart.[
-              .{
-                pos = .{50, 200},
-                velo = .{100, 0}},
-
-              .{
-                pos = .{50, 500},
-                velo = .{200, 0}}];
-
-Fart :: struct {
-    pos: Vector2;
-    velo: Vector2;
-}
 
 main :: () {
     init_window();
@@ -24,7 +11,7 @@ main :: () {
     // make_entity(.{100, 100});
     // make_entity(.{300, 250});
     bug1 := make_character(.{100, 100});
-    bug2 := make_character(.{300, 250}, .{1000000, 0});
+    bug2 := make_character(.{300, 250}, .{10, 0});
     bug3 := make_character(.{600, 250});
     add_thing(*debug_room_things, bug1);
     add_thing(*debug_room_things, bug2);
