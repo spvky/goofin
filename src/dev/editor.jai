@@ -97,12 +97,21 @@ mouse_position_to_world :: () -> Vector2 {
     return pos + camera.target;
 }
 
+/* 
+	These macros will be written at compile time to enable automatically display
+	struct members in the inpsector window If they are noted with @editor_display
+*/
+#placeholder draw_character_data_fields;
+#placeholder draw_collision_data_fields;
+
 draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
     // Add unique fields here based on the type of thing selected, could be fun to define notes on the data fields and find a way to render the fields procedurally instead of placing each text input manually
     ent_idx := editor_selection.selected_entity_idx;
     entity := get_thing_ptr(*debug_room_things, ent_idx);
 
-    x := r.x + 20;
+    draw_character_data_fields();
+
+    x := r.x + 10;
     y := r.y + r.h - 60;
 
     title_rect := Get_Rect.get_rect(x, y, 200, 40);
@@ -164,6 +173,11 @@ modify_float_from_string :: (value_ptr: *float32, float_str: string) -> success:
     return ok;
 }
 
+// Formats a float and returns the resultant string, using the temporary allocator
+float_str :: (f: float32) -> string {
+	return tprint("%", formatFloat(f, 2, 0, zero_removal = .NO);
+}
+
 Editor_Assets :: struct {
     font: *Simp.Dynamic_Font;
 }
@@ -175,79 +189,40 @@ load_editor_assets :: () {
     assert(editor_assets.font != null);
 }
 
-// vector2_text_input :: (x: *float32, y: *float32, value_ptr: *Vector2, index: *u8) {
-//     text_extents := Vector2.{150, 35};
-//     r1 := Get_Rect.get_rect(x, y, text_extents.x, text_extents.y);
-//     r2 := Get_Rect.get_rect(x + 155, y, text_extents.x, text_extents.y);
-// 
-//     /* a scope to prevent copy/paste errors */{
-//         x_str := tprint("%", formatFloat(value_ptr.x, 2, 0, zero_removal = .NO));
-//         // add index here to avoid rewrite
-//         action_x, new_text_x, state_x := Get_Rect.text_input(r1, x_str, *my_theme.text_input_theme);
-//         if action_x & .ENTERED {
-//             if modify_float_from_string(*value_ptr.x, new_text_x) {
-//                 new_x_str := tprint("%", formatFloat(value_ptr.x, 2, 2, zero_removal = .NO));
-//             }
-//         }
-//         if !state_x.active {
-//             Get_Rect.reset(state_x);
-//         }
-//     }
-// 
-//     /* a scope to prevent copy/paste errors */{
-//         y_str := tprint("%", formatFloat(value_ptr.y, 2, 2, zero_removal = .NO));
-//         // add index here to avoid rewrite
-//         action_y, new_text_y, state_y := Get_Rect.text_input(r2, y_str, *my_theme.text_input_theme);
-//         if action_y & .ENTERED {
-//             if modify_float_from_string(*value_ptr.y, new_text_y) {
-//                 new_y_str := tprint("%", formatFloat(value_ptr.y, 2, 2, zero_removal = .NO));
-//             }
-//         }
-//         if !state_y.active {
-//             Get_Rect.reset(state_y);
-//         }
-//     }
-// }
+#import "String";
 
 /*
-Comptime notes
-When inspecting thing fields:
-{ARRAY,16} = [2]Vector2;
-{ARRAY,24} = [3]Vector2;
-{ARRAY,32} = [4]Vector2;
-{STRUCT, 8} = Vector2;
+vector2_text_input :: (x: *float32, y: *float32, value_ptr: *Vector2, index: *u8) {
+    text_extents := Vector2.{150, 35};
+    r1 := Get_Rect.get_rect(x, y, text_extents.x, text_extents.y);
+    r2 := Get_Rect.get_rect(x + 155, y, text_extents.x, text_extents.y);
 
-editor_vector_2_field :: () {
+    /* a scope to prevent copy/paste errors */{
+        x_str := tprint("%", formatFloat(value_ptr.x, 2, 0, zero_removal = .NO));
+        // add index here to avoid rewrite
+        action_x, new_text_x, state_x := Get_Rect.text_input(r1, x_str, *my_theme.text_input_theme);
+        if action_x & .ENTERED {
+            if modify_float_from_string(*value_ptr.x, new_text_x) {
+                new_x_str := tprint("%", formatFloat(value_ptr.x, 2, 2, zero_removal = .NO));
+            }
+        }
+        if !state_x.active {
+            Get_Rect.reset(state_x);
+        }
+    }
+
+    /* a scope to prevent copy/paste errors */{
+        y_str := tprint("%", formatFloat(value_ptr.y, 2, 2, zero_removal = .NO));
+        // add index here to avoid rewrite
+        action_y, new_text_y, state_y := Get_Rect.text_input(r2, y_str, *my_theme.text_input_theme);
+        if action_y & .ENTERED {
+            if modify_float_from_string(*value_ptr.y, new_text_y) {
+                new_y_str := tprint("%", formatFloat(value_ptr.y, 2, 2, zero_removal = .NO));
+            }
+        }
+        if !state_y.active {
+            Get_Rect.reset(state_y);
+        }
+    }
 }
-
-Editor_Vector_2_Field :: struct {
-	
-}
-
-Editor_Display_Field ::  {
-	field_name: string,
-	field_type: Type,
-	display_proc: proc();
-}
-
-write the procs from comptime
-
-a :: (edf: *Editor_Display_Field) {
-	field_offset: int
-	if edf.field_type == {
-		case Vector2;
-		case float32;
-	}
-	case on type
-	vector2_text_input (x: *float32, y: *float32>)
-}
-
-Editor
-
-What data would need to be created to render the editors
-
-
-
-
-
 */

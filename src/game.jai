@@ -64,8 +64,8 @@ Get_Rect :: #import "GetRect";
 #load "player.jai";
 #load "collision.jai";
 #load "preload_test.jai";
-
-#if DEV_MODE {
-    #import "String";
-    #load "dev/editor.jai";
-}
+// 
+// #if DEV_MODE {
+//     #import "String";
+//     #load "dev/editor.jai";
+// }
