@@ -3,8 +3,8 @@ MAX_THINGS_PER_ROOM :: 128;
 Thing :: struct {
     using position: Vector2;
     kind: Thing_Kind;
-    collision_data: Collision_Data;
-    #overlay (collision_data) character_data: Character_Data;
+    using collision_data: Collision_Data;
+    #overlay (collision_data) using character_data: Character_Data;
 }
 
 Thing_Room_Manager :: struct {
@@ -59,12 +59,18 @@ Character_Data :: struct @thing_data {
 }
 
 Collision_Data :: struct @thing_data {
-    kind: Collision_Shape_Kind;
+    collision_shape: Collision_Shape;
     is_sensor := false;
     verts: void;
     polygon_verts: [4]Vector2; @editor_display
     #overlay (polygon_verts) aabb_extents: [2]Vector2; @editor_display
     #overlay (polygon_verts) triangle_verts: [3]Vector2; @editor_display
+}
+
+Collision_Shape :: enum {
+    TRIANGLE;
+    POLYGON;
+    AABB;
 }
 
 Character_Kind :: enum {
@@ -75,7 +81,8 @@ make_collision_aabb :: (position: Vector2, min: Vector2, max: Vector2) -> Thing 
     thing: Thing;
     thing.position = position;
     thing.kind = .COLLISION;
-    thing.collision_data = .{kind = .AABB, aabb_extents = .[min, max]};
+    thing.collision_shape = .AABB;
+    thing.aabb_extents = .[min, max];
     return thing;
 }
 
@@ -83,7 +90,8 @@ make_collision_tri :: (position: Vector2, points: [3]Vector2) -> Thing {
     thing: Thing;
     thing.position = position;
     thing.kind = .COLLISION;
-    thing.collision_data = .{kind = .TRIANGLE, triangle_verts = points};
+    thing.collision_shape = .TRIANGLE;
+    thing.triangle_verts = points;
     return thing;
 }
 
@@ -91,7 +99,8 @@ make_collision_poly :: (position: Vector2, points: [4]Vector2) -> Thing {
     thing: Thing;
     thing.position = position;
     thing.kind = .COLLISION;
-    thing.collision_data = .{kind = .POLYGON, polygon_verts = points};
+    thing.collision_shape = .POLYGON;
+    thing.polygon_verts = points;
     return thing;
 }
 
@@ -114,27 +123,25 @@ render_single_thing :: (thing: *Thing) {
     pos := cam_relative_position(thing.position);
     if thing.kind == {
     case .CHARACTER;
-        data := thing.character_data;
-        render_sprite_centered(data.map, pos, data.size, .{1, 1, 1, 1});
+        render_sprite_centered(thing.map, pos, thing.size, .{1, 1, 1, 1});
     case .COLLISION;
-        data := thing.collision_data;
-        if data.kind == {
+        if thing.collision_shape == {
         case .AABB;
-            p0 := pos + .{data.aabb_extents[0].x, data.aabb_extents[0].y};
-            p1 := pos + .{data.aabb_extents[0].x, data.aabb_extents[1].y};
-            p2 := pos + .{data.aabb_extents[1].x, data.aabb_extents[1].y};
-            p3 := pos + .{data.aabb_extents[1].x, data.aabb_extents[0].y};
+            p0 := pos + .{thing.aabb_extents[0].x, thing.aabb_extents[0].y};
+            p1 := pos + .{thing.aabb_extents[0].x, thing.aabb_extents[1].y};
+            p2 := pos + .{thing.aabb_extents[1].x, thing.aabb_extents[1].y};
+            p3 := pos + .{thing.aabb_extents[1].x, thing.aabb_extents[0].y};
             Simp.immediate_quad(p0, p1, p2, p3, .{0, 0, 0.7, 1});
         case .TRIANGLE;
-            p0 := pos + data.triangle_verts[0];
-            p1 := pos + data.triangle_verts[1];
-            p2 := pos + data.triangle_verts[2];
+            p0 := pos + thing.triangle_verts[0];
+            p1 := pos + thing.triangle_verts[1];
+            p2 := pos + thing.triangle_verts[2];
             Simp.immediate_quad(p0, p0, p1, p2, .{0, 0.7, 0, 1});
         case .POLYGON;
-            p0 := pos + data.polygon_verts[0];
-            p1 := pos + data.polygon_verts[1];
-            p2 := pos + data.polygon_verts[2];
-            p3 := pos + data.polygon_verts[3];
+            p0 := pos + thing.polygon_verts[0];
+            p1 := pos + thing.polygon_verts[1];
+            p2 := pos + thing.polygon_verts[2];
+            p3 := pos + thing.polygon_verts[3];
             Simp.immediate_quad(p0, p1, p2, p3, .{0.7, 0, 0, 1});
         }
     }
@@ -153,6 +160,25 @@ render_things_in_room :: (tm: Thing_Room_Manager) {
                 render_square(pos, .{10, 10}, .{1, 1, 1, 1});
             }
         }
+    }
+
+    for o: orbs {
+        render_square(o.pos, .{100, 100}, .{0, 0, 1, 1});
+    }
+}
+
+apply_thing_velocity :: (delta: float32) {
+    for *t: debug_room_things {
+        if t.kind == .CHARACTER {
+            if t.velocity.x > 0.0 {
+                print("Pre:\n\tPos: %\n\tVelo: %\n", t.position, t.velocity);
+                t.position += t.velocity * delta;
+                print("Post:\n\tPos: %\n\tVelo: %\n", t.position, t.velocity);
+            }
+        }
+    }
+    for *o: orbs {
+        o.pos += o.velo * delta;
     }
 }
 

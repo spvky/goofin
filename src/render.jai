@@ -10,21 +10,22 @@ init_textures :: () {
 
 render :: () {
     #if DEV_MODE {
-        Simp.clear_render_target(0.2, 0.1, 0.5, 1);
+        if editor_mode {
+            Simp.clear_render_target(0.2, 0.1, 0.5, 1);
+        } else {
+            Simp.clear_render_target(0, 1, 0, 1);
+        }
     } else {
         Simp.clear_render_target(0, 1, 0, 1);
     }
     #if DEV_MODE {
         render_editor_grid();
     }
-    // Draw Scene
-    // render_collision_shape(tri);
-    // render_collision_shape(aabb);
-    // render_square(cam_relative_position(.{0, 0}), .{10, 10});
-    // render_entities();
     render_things_in_room(debug_room_things);
     #if DEV_MODE {
-        render_editor_ui();
+        if editor_mode {
+            render_editor_ui();
+        }
     }
     Simp.swap_buffers(n_window.resource);
 }
@@ -51,7 +52,6 @@ render_sprite_centered :: (texture: *Texture, pos: Vector2, size: Vector2, color
     p2 := pos + h + v;
     p3 := pos - h + v;
     Simp.immediate_quad(p0, p1, p2, p3, color);
-    // Simp.immediate_quad(.{0, 200}, .{100, 200}, .{100, 300}, .{0, 300}, .{1, 1, 1, 1});
 }
 
 render_square :: (position: Vector2, extents: Vector2, color := Vector4.{0, 0, 0, 1}) {

@@ -105,57 +105,21 @@ mouse_position_to_world :: () -> Vector2 {
 #placeholder draw_collision_data_fields;
 
 draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
-    // Add unique fields here based on the type of thing selected, could be fun to define notes on the data fields and find a way to render the fields procedurally instead of placing each text input manually
-    ent_idx := editor_selection.selected_entity_idx;
-    entity := get_thing_ptr(*debug_room_things, ent_idx);
-
-    draw_character_data_fields();
-
-    x := r.x + 10;
-    y := r.y + r.h - 60;
-
-    title_rect := Get_Rect.get_rect(x, y, 200, 40);
-    Get_Rect.label(title_rect, tprint("%", entity.kind), *my_theme.label_theme);
-
-    locked_rect := Get_Rect.get_rect(r.x + r.w - 200, y, 200, 50);
+    locked_rect := Get_Rect.get_rect(r.x + r.w - 200, r.y + r.h - 60, 200, 50);
     pressed := Get_Rect.base_checkbox(locked_rect, "Locked", editor_selection.locked, *my_theme.checkbox_theme);
     editor_selection.locked ^= pressed;
 
-    y -= 45;
+    ent_idx := editor_selection.selected_entity_idx;
+    entity := get_thing_ptr(*debug_room_things, ent_idx);
 
-    data := *editor_selection.entity_data;
-    inspector_subwindow.title_text = "Inspector";
+    label_left_margin := r.x - 5;
+    text_left_margin := r.x + 30;
+    y_pos := r.y + r.h - 60;
+
+    label_extents := Vector2.{600, 35};
     text_extents := Vector2.{150, 35};
 
-    r1 := Get_Rect.get_rect(x, y, text_extents.x, text_extents.y);
-    // y -= 45;
-    r2 := Get_Rect.get_rect(x + 155, y, text_extents.x, text_extents.y);
-
-    /* a scope to prevent copy/paste errors */{
-        x_str := tprint("%", formatFloat(entity.position.x, 2, 2, zero_removal = .NO));
-        action_x, new_text_x, state_x := Get_Rect.text_input(r1, x_str, *my_theme.text_input_theme);
-        if action_x & .ENTERED {
-            if modify_float_from_string(*entity.position.x, new_text_x) {
-                new_x_str := tprint("%", formatFloat(entity.position.x, 2, 2, zero_removal = .NO));
-            }
-        }
-        if !state_x.active {
-            Get_Rect.reset(state_x);
-        }
-    }
-
-    /* a scope to prevent copy/paste errors */{
-        y_str := tprint("%", formatFloat(entity.position.y, 2, 2, zero_removal = .NO));
-        action_y, new_text_y, state_y := Get_Rect.text_input(r2, y_str, *my_theme.text_input_theme);
-        if action_y & .ENTERED {
-            if modify_float_from_string(*entity.position.y, new_text_y) {
-                new_y_str := tprint("%", formatFloat(entity.position.y, 2, 2, zero_removal = .NO));
-            }
-        }
-        if !state_y.active {
-            Get_Rect.reset(state_y);
-        }
-    }
+    draw_character_data_fields();
 
     mouse_pos := mouse_position_to_world();
     pos_label := Get_Rect.get_rect(r.x - 10, r.y - 20, 400, 80);
@@ -175,7 +139,7 @@ modify_float_from_string :: (value_ptr: *float32, float_str: string) -> success:
 
 // Formats a float and returns the resultant string, using the temporary allocator
 float_str :: (f: float32) -> string {
-	return tprint("%", formatFloat(f, 2, 0, zero_removal = .NO);
+    return tprint("%", formatFloat(f, 2, 0, zero_removal = .NO));
 }
 
 Editor_Assets :: struct {
@@ -190,39 +154,3 @@ load_editor_assets :: () {
 }
 
 #import "String";
-
-/*
-vector2_text_input :: (x: *float32, y: *float32, value_ptr: *Vector2, index: *u8) {
-    text_extents := Vector2.{150, 35};
-    r1 := Get_Rect.get_rect(x, y, text_extents.x, text_extents.y);
-    r2 := Get_Rect.get_rect(x + 155, y, text_extents.x, text_extents.y);
-
-    /* a scope to prevent copy/paste errors */{
-        x_str := tprint("%", formatFloat(value_ptr.x, 2, 0, zero_removal = .NO));
-        // add index here to avoid rewrite
-        action_x, new_text_x, state_x := Get_Rect.text_input(r1, x_str, *my_theme.text_input_theme);
-        if action_x & .ENTERED {
-            if modify_float_from_string(*value_ptr.x, new_text_x) {
-                new_x_str := tprint("%", formatFloat(value_ptr.x, 2, 2, zero_removal = .NO));
-            }
-        }
-        if !state_x.active {
-            Get_Rect.reset(state_x);
-        }
-    }
-
-    /* a scope to prevent copy/paste errors */{
-        y_str := tprint("%", formatFloat(value_ptr.y, 2, 2, zero_removal = .NO));
-        // add index here to avoid rewrite
-        action_y, new_text_y, state_y := Get_Rect.text_input(r2, y_str, *my_theme.text_input_theme);
-        if action_y & .ENTERED {
-            if modify_float_from_string(*value_ptr.y, new_text_y) {
-                new_y_str := tprint("%", formatFloat(value_ptr.y, 2, 2, zero_removal = .NO));
-            }
-        }
-        if !state_y.active {
-            Get_Rect.reset(state_y);
-        }
-    }
-}
-*/

@@ -4,17 +4,27 @@ aabb: Collision_Shape;
 
 getrect_captured_mouse: bool;
 getrect_captured_keyboard: bool;
+orbs := Fart.[
+              .{
+                pos = .{50, 200},
+                velo = .{100, 0}},
+
+              .{
+                pos = .{50, 500},
+                velo = .{200, 0}}];
+
+Fart :: struct {
+    pos: Vector2;
+    velo: Vector2;
+}
 
 main :: () {
-    tri = make_tri(.[.{50, 200}, .{50, 400}, .{200, 200}]);
-    aabb = make_aabb(.{300, 300}, .{500, 500});
-
     init_window();
     init_textures();
     // make_entity(.{100, 100});
     // make_entity(.{300, 250});
     bug1 := make_character(.{100, 100});
-    bug2 := make_character(.{300, 250});
+    bug2 := make_character(.{300, 250}, .{1000000, 0});
     bug3 := make_character(.{600, 250});
     add_thing(*debug_room_things, bug1);
     add_thing(*debug_room_things, bug2);
@@ -64,8 +74,3 @@ Get_Rect :: #import "GetRect";
 #load "player.jai";
 #load "collision.jai";
 #load "preload_test.jai";
-// 
-// #if DEV_MODE {
-//     #import "String";
-//     #load "dev/editor.jai";
-// }
