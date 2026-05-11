@@ -4,7 +4,6 @@ EXECUTABLE_BASE_NAME := "negative-zero";
     #import "Compiler";
     #import "Basic";
     #import "String";
-    #import "Math";
     #load "codegen.jai";
     Autorun :: #import "Autorun";
     // Parse args
@@ -52,7 +51,7 @@ EXECUTABLE_BASE_NAME := "negative-zero";
                         print("%\n", struct_name);
                         for member: s.expression.defined_type.members {
                             member_type: Type = (cast(*Type)(*member.type)).*;
-                            field := Editor_Codegen_Field.{member_name = member.name, member_type_name = tprint("%", member_type)};
+                            field := Editor_Codegen_Field.{member_name = member.name, member_type = member_type, member_type_name = tprint("%", member_type)};
 
                             for field_note: member.notes {
                                 if equal(field_note, "editor_display") {
@@ -76,7 +75,7 @@ EXECUTABLE_BASE_NAME := "negative-zero";
 							and insert our generated procedures for editor fields */
             if ends_with(file.fully_pathed_filename, "editor.jai") && dev && finished_type_checking_pre_codegen {
                 placeholder_build_string := editor_codegen(character_data_fields, collision_data_fields);
-                print(placeholder_build_string);
+                // print(placeholder_build_string);
                 add_build_string(placeholder_build_string, w, file);
             }
         case .PHASE;

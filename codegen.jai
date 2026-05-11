@@ -1,6 +1,7 @@
 // Editor Codegen
 Editor_Codegen_Field :: struct {
     member_name: string;
+    member_type: Type;
     member_type_name: string;
 }
 
@@ -10,7 +11,7 @@ draw_character_data_fields :: () #expand {
 }
 END
 
-LABEL_INPUT_STRING :: #string END
+VEC2_INSPECTOR_STRING :: #string END
 	%1_label_rect := Get_Rect.get_rect(`label_left_margin, `y_pos, `label_extents.x, `label_extents.y);
 	// shift y_pos when we finish defining rects for a row
 	`y_pos -= (`label_extents.y + 5);
@@ -20,15 +21,13 @@ LABEL_INPUT_STRING :: #string END
 
 
   Get_Rect.label(%1_label_rect, "%1", *my_theme.label_theme);
-END
 
-VECTOR2_INPUT_STRING :: #string END
 	{
-		x_str := float_str(`entity.%1.x);
+		x_str := float_str(`entity.%2.x);
 		action_x, new_text_x, state_x := Get_Rect.text_input(%1_x_rect, x_str, *my_theme.text_input_theme);
 		if action_x & .ENTERED {
-				if modify_float_from_string(*`entity.%1.x, new_text_x) {
-						new_x_str := float_str(`entity.%1.x);
+				if modify_float_from_string(*`entity.%2.x, new_text_x) {
+						new_x_str := float_str(`entity.%2.x);
 				}
 		}
 		if !state_x.active {
@@ -37,11 +36,11 @@ VECTOR2_INPUT_STRING :: #string END
 	}
 
   {
-		y_str := float_str(`entity.%1.y);
+		y_str := float_str(`entity.%2.y);
 		action_y, new_text_y, state_y := Get_Rect.text_input(%1_y_rect, y_str, *my_theme.text_input_theme);
 		if action_y & .ENTERED {
-				if modify_float_from_string(*`entity.%1.y, new_text_y) {
-						new_y_str := float_str(`entity.%1.y);
+				if modify_float_from_string(*`entity.%2.y, new_text_y) {
+						new_y_str := float_str(`entity.%2.y);
 				}
 		}
 		if !state_y.active {
@@ -50,24 +49,47 @@ VECTOR2_INPUT_STRING :: #string END
   }
 END
 
+// Building block for Vec2 editor fields
+vec2_inspector_field :: (label_text: string, access_pattern: string) -> string {
+    return tprint(VEC2_INSPECTOR_STRING, label_text, access_pattern);
+}
+
+vec2_inspector_field :: (label_text: string) -> string {
+    return tprint(VEC2_INSPECTOR_STRING, label_text, label_text);
+}
+
 // Generate the code to handle character data fields
 editor_codegen :: (char_fields: []Editor_Codegen_Field, col_fields: []Editor_Codegen_Field) -> string {
     // Build character data proc
     char_data_builder: String_Builder;
 
-    print_to_builder(*char_data_builder, LABEL_INPUT_STRING, "position");
-    print_to_builder(*char_data_builder, VECTOR2_INPUT_STRING, "position");
+    print_to_builder(*char_data_builder, vec2_inspector_field("position"));
 
     for field: char_fields {
         if equal(field.member_type_name, "Vector2") {
-            print_to_builder(*char_data_builder, LABEL_INPUT_STRING, field.member_name);
-            print_to_builder(*char_data_builder, VECTOR2_INPUT_STRING, field.member_name);
+            if math.Vector2 == field.member_type {
+                print("FOUND A VECCY\n");
+            }
+            print_to_builder(*char_data_builder, vec2_inspector_field(field.member_name));
         }
     }
 
     char_data_string := builder_to_string(*char_data_builder);
     // //////////////////////////
 
+    // Build collision data proc
+    col_data_builder: String_Builder;
+    for field: col_fields {
+        print("Found Fields: %\n", field);
+        if equal(field.member_type_name, "Vector2") {
+            print_to_builder(*char_data_builder, vec2_inspector_field(field.member_name));
+        }
+    }
+
+    col_data_string := builder_to_string(*col_data_builder);
+
     final_string := tprint(PLACEHOLDER_INSERTION_STRING, char_data_string);
     return final_string;
 }
+
+math :: #import "Math";

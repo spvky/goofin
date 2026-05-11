@@ -442,7 +442,6 @@ draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *vo
 }
 
 modify_float_from_string :: (value_ptr: *float32, float_str: string) -> success: bool {
-    print("MODIFYIN'\n");
     new_value, ok := parse_float(*float_str);
     if ok {
         value_ptr.* = new_value;

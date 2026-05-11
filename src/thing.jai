@@ -154,9 +154,28 @@ render_things_in_room :: (tm: Thing_Room_Manager) {
         render_single_thing(thing);
         #if DEV_MODE {
             // If selected entity is a collider, highlight the points here
+
             selected_entity := i == xx editor_selection.selected_entity_idx;
             if selected_entity {
                 render_square(pos, .{10, 10}, .{1, 0, 0, 1});
+                if editor_selection.locked {
+                    if thing.kind == .COLLISION {
+                        if thing.collision_shape == {
+                        case .AABB;
+                            for i: 0..1 {
+                                render_square(pos + thing.aabb_extents[i], .{10, 10}, .{1, 1, 1, 1});
+                            }
+                        case .TRIANGLE;
+                            for i: 0..1 {
+                                render_square(pos + thing.triangle_verts[i], .{10, 10}, .{1, 1, 1, 1});
+                            }
+                        case .POLYGON;
+                            for i: 0..1 {
+                                render_square(pos + thing.polygon_verts[i], .{10, 10}, .{1, 1, 1, 1});
+                            }
+                        }
+                    }
+                }
             } else if !selected_entity && !editor_selection.locked {
                 render_square(pos, .{10, 10}, .{1, 1, 1, 1});
             }
