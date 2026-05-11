@@ -87,6 +87,13 @@ make_collision_aabb :: (position: Vector2, min: Vector2, max: Vector2) -> Thing 
     return thing;
 }
 
+make_collision_aabb_simple :: (position: Vector2) -> Thing {
+    points: [2]Vector2;
+    points[0] = .{-50, -50};
+    points[1] = .{50, 50};
+    return make_collision_aabb(position, points[0], points[1]);
+}
+
 make_collision_tri :: (position: Vector2, points: [3]Vector2) -> Thing {
     thing: Thing;
     thing.position = position;
@@ -96,6 +103,14 @@ make_collision_tri :: (position: Vector2, points: [3]Vector2) -> Thing {
     return thing;
 }
 
+make_collision_right_tri :: (position: Vector2) -> Thing {
+    points: [3]Vector2;
+    points[0] = .{-50, 50};
+    points[1] = .{-50, -50};
+    points[2] = .{50, -50};
+    return make_collision_tri(position, points);
+}
+
 make_collision_poly :: (position: Vector2, points: [4]Vector2) -> Thing {
     thing: Thing;
     thing.position = position;
@@ -103,6 +118,28 @@ make_collision_poly :: (position: Vector2, points: [4]Vector2) -> Thing {
     thing.collision_shape = .POLYGON;
     thing.polygon_verts = points;
     return thing;
+}
+
+make_collision_poly_square :: (position: Vector2) -> Thing {
+    points: [4]Vector2;
+    points[0] = .{-50, -50};
+    points[1] = .{-50, 50};
+    points[2] = .{50, 50};
+    points[3] = .{50, -50};
+    return make_collision_poly(position, points);
+}
+
+get_collision_vertex_collection :: (thing: *Thing) -> []Vector2 {
+    collection: []Vector2;
+    if thing.collision_shape == {
+    case .AABB;
+        collection = thing.aabb_extents;
+    case .TRIANGLE;
+        collection = thing.triangle_verts;
+    case .POLYGON;
+        collection = thing.polygon_verts;
+    }
+    return collection;
 }
 
 make_character :: (position := Vector2.{0, 0}, velocity := Vector2.{0, 0}, character_kind: Character_Kind = .BUG) -> Thing {
@@ -126,6 +163,7 @@ render_single_thing :: (thing: *Thing) {
     case .CHARACTER;
         render_sprite_centered(thing.map, pos, thing.size, .{1, 1, 1, 1});
     case .COLLISION;
+        Simp.set_shader_for_color();
         if thing.collision_shape == {
         case .AABB;
             p0 := pos + .{thing.aabb_extents[0].x, thing.aabb_extents[0].y};
@@ -153,26 +191,14 @@ render_things_in_room :: (tm: Thing_Room_Manager) {
         pos := cam_relative_position(thing.position);
         render_single_thing(thing);
         #if DEV_MODE {
-            // If selected entity is a collider, highlight the points here
-
             selected_entity := i == xx editor_selection.selected_entity_idx;
             if selected_entity {
                 render_square(pos, .{10, 10}, .{1, 0, 0, 1});
                 if editor_selection.locked {
                     if thing.kind == .COLLISION {
-                        if thing.collision_shape == {
-                        case .AABB;
-                            for i: 0..1 {
-                                render_square(pos + thing.aabb_extents[i], .{10, 10}, .{1, 1, 1, 1});
-                            }
-                        case .TRIANGLE;
-                            for i: 0..1 {
-                                render_square(pos + thing.triangle_verts[i], .{10, 10}, .{1, 1, 1, 1});
-                            }
-                        case .POLYGON;
-                            for i: 0..1 {
-                                render_square(pos + thing.polygon_verts[i], .{10, 10}, .{1, 1, 1, 1});
-                            }
+                        verts := get_collision_vertex_collection(thing);
+                        for v: verts {
+                            render_square(pos + v, .{10, 10}, .{1, 1, 1, 1});
                         }
                     }
                 }
@@ -197,7 +223,16 @@ apply_thing_velocity :: (delta: float32) {
         data := *editor_selection.entity_data;
         if is_action_pressed(.EDITOR_SELECT) {
             if editor_selection.locked {
-                // Do moving collision points here
+                thing := get_thing_ptr(tm, editor_selection.selected_entity_idx);
+                verts := get_collision_vertex_collection(thing);
+                for v, i: verts {
+                    adjusted_v := thing.position + v;
+                    if distance(pos, adjusted_v) < 30 {
+                        data.held_entity_component_idx = xx i;
+                        data.held_component = true;
+                        break;
+                    }
+                }
             } else {
                 for thing, i: tm {
                     if distance(pos, thing.position) < 30 && !data.held_entity {
@@ -210,10 +245,16 @@ apply_thing_velocity :: (delta: float32) {
             }
         } else {
             data.held_entity = false;
+            data.held_component = false;
         }
         if data.held_entity {
             thing := get_thing_ptr(tm, data.held_entity_idx);
             thing.position = pos;
+        }
+        if data.held_component {
+            thing := get_thing_ptr(tm, data.held_entity_idx);
+            comp_ptr := *thing.polygon_verts[data.held_entity_component_idx];
+            comp_ptr.* = pos - thing.position;
         }
     }
 }

@@ -3,12 +3,13 @@ Editor_Selection :: struct {
     selected_entity_idx: u32;
     entity_data: Editor_Entity_Data;
     locked: bool;
-    #overlay (entity_data) collider_data: Editor_Entity_Data;
 }
 
 Editor_Entity_Data :: struct {
     held_entity := false;
     held_entity_idx: u32;
+    held_component := false;
+    held_entity_component_idx: s32 = -1;
 }
 
 editor_selection: Editor_Selection;
