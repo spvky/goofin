@@ -9,7 +9,7 @@ Thing :: struct {
 
 Thing_Room_Manager :: struct {
     things: [MAX_THINGS_PER_ROOM]Thing;
-    used: [MAX_SHAPES_PER_ROOM]bool;
+    used: [MAX_THINGS_PER_ROOM]bool;
     next_free: int = 0;
 }
 
@@ -58,6 +58,7 @@ Character_Data :: struct @thing_data {
     map: *Texture;
 }
 
+// Because of the nature of putting arrays through my codegen proc these will be handled manually until that becomes annoying, leaving the editor display tags here to remind myself
 Collision_Data :: struct @thing_data {
     collision_shape: Collision_Shape;
     is_sensor := false;

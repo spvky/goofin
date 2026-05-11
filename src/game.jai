@@ -13,9 +13,11 @@ main :: () {
     bug1 := make_character(.{100, 100});
     bug2 := make_character(.{300, 250}, .{10, 0});
     bug3 := make_character(.{600, 250});
+    aabb := make_collision_aabb(.{300, 300}, .{-100, -100}, .{100, 100});
     add_thing(*debug_room_things, bug1);
     add_thing(*debug_room_things, bug2);
     add_thing(*debug_room_things, bug3);
+    add_thing(*debug_room_things, aabb);
     #if DEV_MODE {
         editor_init();
     }
@@ -59,5 +61,4 @@ Get_Rect :: #import "GetRect";
 #load "simulate.jai";
 #load "input.jai";
 #load "player.jai";
-#load "collision.jai";
 #load "preload_test.jai";

@@ -8,13 +8,9 @@ PLACEHOLDER_INSERTION_STRING :: #string END
 draw_character_data_fields :: () #expand {
 	%1
 }
-
-draw_collision_data_fields :: () #expand {
-	%2
-}
 END
 
-VECTOR2_INPUT_STRING :: #string END
+LABEL_INPUT_STRING :: #string END
 	%1_label_rect := Get_Rect.get_rect(`label_left_margin, `y_pos, `label_extents.x, `label_extents.y);
 	// shift y_pos when we finish defining rects for a row
 	`y_pos -= (`label_extents.y + 5);
@@ -24,7 +20,9 @@ VECTOR2_INPUT_STRING :: #string END
 
 
   Get_Rect.label(%1_label_rect, "%1", *my_theme.label_theme);
+END
 
+VECTOR2_INPUT_STRING :: #string END
 	{
 		x_str := float_str(`entity.%1.x);
 		action_x, new_text_x, state_x := Get_Rect.text_input(%1_x_rect, x_str, *my_theme.text_input_theme);
@@ -52,14 +50,17 @@ VECTOR2_INPUT_STRING :: #string END
   }
 END
 
+// Generate the code to handle character data fields
 editor_codegen :: (char_fields: []Editor_Codegen_Field, col_fields: []Editor_Codegen_Field) -> string {
     // Build character data proc
     char_data_builder: String_Builder;
 
+    print_to_builder(*char_data_builder, LABEL_INPUT_STRING, "position");
     print_to_builder(*char_data_builder, VECTOR2_INPUT_STRING, "position");
 
     for field: char_fields {
         if equal(field.member_type_name, "Vector2") {
+            print_to_builder(*char_data_builder, LABEL_INPUT_STRING, field.member_name);
             print_to_builder(*char_data_builder, VECTOR2_INPUT_STRING, field.member_name);
         }
     }
@@ -67,15 +68,6 @@ editor_codegen :: (char_fields: []Editor_Codegen_Field, col_fields: []Editor_Cod
     char_data_string := builder_to_string(*char_data_builder);
     // //////////////////////////
 
-    // Build collision data proc
-    col_data_builder: String_Builder;
-    print_to_builder(*col_data_builder, VECTOR2_INPUT_STRING, "position");
-    for field: col_fields {
-    }
-
-    col_data_string := builder_to_string(*col_data_builder);
-    // //////////////////////////
-
-    final_string := tprint(PLACEHOLDER_INSERTION_STRING, char_data_string, col_data_string);
+    final_string := tprint(PLACEHOLDER_INSERTION_STRING, char_data_string);
     return final_string;
 }
