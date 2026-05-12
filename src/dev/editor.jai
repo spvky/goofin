@@ -18,6 +18,11 @@ inspector_subwindow := Get_Rect.Subwindow_Info.{
                                                 draw = draw_inspector,
                                                 title_text = "Inspector"};
 
+actions_subwindow := Get_Rect.Subwindow_Info.{
+                                              rect = #run Get_Rect.get_rect(cast(float32)n_window.width - 610, cast(float32)n_window.height - 400, 600, 400),
+                                              draw = draw_actions,
+                                              title_text = "Actions"};
+
 editor_init :: () {
     load_editor_assets();
     Get_Rect.ui_init();
@@ -79,6 +84,7 @@ render_editor_ui :: () {
     getrect_captured_mouse, getrect_captured_keyboard = Get_Rect.ui_per_frame_update(n_window.resource, w, h, current_time);
 
     Get_Rect.add_subwindow(*inspector_subwindow, *my_theme.subwindow_theme);
+    Get_Rect.add_subwindow(*actions_subwindow, *my_theme.subwindow_theme);
 
     Get_Rect.draw_popups();
 }
@@ -409,6 +415,29 @@ draw_collision_data_fields :: (col_shape: Collision_Shape) #expand {
                 Get_Rect.reset(state_y);
             }
         }
+    }
+}
+
+draw_actions :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
+    make_aabb_rect := Get_Rect.get_rect(r.x, r.y + r.h - 50, 200, 50);
+    make_tri_rect := Get_Rect.get_rect(r.x, r.y + r.h - 105, 200, 50);
+    make_poly_rect := Get_Rect.get_rect(r.x, r.y + r.h - 160, 200, 50);
+
+    aabb_pressed := Get_Rect.button(make_aabb_rect, "AABB");
+    tri_pressed := Get_Rect.button(make_tri_rect, "Tri");
+    poly_pressed := Get_Rect.button(make_poly_rect, "Polygon");
+
+    if aabb_pressed {
+        aabb := make_collision_aabb_simple(.{600, 600});
+        add_thing(*debug_room_things, aabb);
+    }
+    if tri_pressed {
+        tri := make_collision_right_tri(.{600, 600});
+        add_thing(*debug_room_things, tri);
+    }
+    if poly_pressed {
+        poly := make_collision_poly_square(.{600, 600});
+        add_thing(*debug_room_things, poly);
     }
 }
 
