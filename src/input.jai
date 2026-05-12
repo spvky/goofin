@@ -40,6 +40,12 @@ process_input :: () {
                 } else {
                     held_actions &= ~.CAM_RIGHT;
                 }
+            case .CTRL;
+                if event.key_pressed {
+                    held_actions |= .EDITOR_LOCK;
+                } else {
+                    held_actions &= ~.EDITOR_LOCK;
+                }
             case;
             }
         }
@@ -70,6 +76,7 @@ Input_Action :: enum_flags u32 {
     MOVE_DOWN;
     JUMP;
     EDITOR_SELECT;
+    EDITOR_LOCK;
 }
 
 held_actions: Input_Action;

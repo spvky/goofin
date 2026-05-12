@@ -191,10 +191,10 @@ render_things_in_room :: (tm: Thing_Room_Manager) {
         pos := cam_relative_position(thing.position);
         render_single_thing(thing);
         #if DEV_MODE {
-            selected_entity := i == xx editor_selection.selected_entity_idx;
+            selected_entity := i == xx editor_state.selected_entity_idx;
             if selected_entity {
                 render_square(pos, .{10, 10}, .{1, 0, 0, 1});
-                if editor_selection.locked {
+                if editor_state.locked {
                     if thing.kind == .COLLISION {
                         verts := get_collision_vertex_collection(thing);
                         for v: verts {
@@ -202,7 +202,7 @@ render_things_in_room :: (tm: Thing_Room_Manager) {
                         }
                     }
                 }
-            } else if !selected_entity && !editor_selection.locked {
+            } else if !selected_entity && !editor_state.locked {
                 render_square(pos, .{10, 10}, .{1, 1, 1, 1});
             }
         }
@@ -220,40 +220,39 @@ apply_thing_velocity :: (delta: float32) {
 #if DEV_MODE {
     thing_editor_picking :: (tm: *Thing_Room_Manager) {
         pos := mouse_position_to_world();
-        data := *editor_selection.entity_data;
         if is_action_pressed(.EDITOR_SELECT) {
-            if editor_selection.locked {
-                thing := get_thing_ptr(tm, editor_selection.selected_entity_idx);
+            if editor_state.locked {
+                thing := get_thing_ptr(tm, editor_state.selected_entity_idx);
                 verts := get_collision_vertex_collection(thing);
                 for v, i: verts {
                     adjusted_v := thing.position + v;
                     if distance(pos, adjusted_v) < 30 {
-                        data.held_entity_component_idx = xx i;
-                        data.held_component = true;
+                        editor_state.held_entity_component_idx = xx i;
+                        editor_state.held_component = true;
                         break;
                     }
                 }
             } else {
                 for thing, i: tm {
-                    if distance(pos, thing.position) < 30 && !data.held_entity {
-                        data.held_entity = true;
-                        data.held_entity_idx = xx i;
-                        editor_selection.selected_entity_idx = xx i;
+                    if distance(pos, thing.position) < 30 && !editor_state.held_entity {
+                        editor_state.held_entity = true;
+                        editor_state.held_entity_idx = xx i;
+                        editor_state.selected_entity_idx = xx i;
                         break;
                     }
                 }
             }
         } else {
-            data.held_entity = false;
-            data.held_component = false;
+            editor_state.held_entity = false;
+            editor_state.held_component = false;
         }
-        if data.held_entity {
-            thing := get_thing_ptr(tm, data.held_entity_idx);
+        if editor_state.held_entity {
+            thing := get_thing_ptr(tm, editor_state.held_entity_idx);
             thing.position = pos;
         }
-        if data.held_component {
-            thing := get_thing_ptr(tm, data.held_entity_idx);
-            comp_ptr := *thing.polygon_verts[data.held_entity_component_idx];
+        if editor_state.held_component {
+            thing := get_thing_ptr(tm, editor_state.held_entity_idx);
+            comp_ptr := *thing.polygon_verts[editor_state.held_entity_component_idx];
             comp_ptr.* = pos - thing.position;
         }
     }

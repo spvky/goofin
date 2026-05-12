@@ -8,20 +8,12 @@ getrect_captured_keyboard: bool;
 main :: () {
     init_window();
     init_textures();
-    // make_entity(.{100, 100});
-    // make_entity(.{300, 250});
     bug1 := make_character(.{100, 100});
     bug2 := make_character(.{300, 250}, .{10, 0});
     bug3 := make_character(.{600, 250});
-    aabb := make_collision_aabb_simple(.{400, 400});
-    tri := make_collision_right_tri(.{300, 300});
-    poly := make_collision_poly_square(.{500, 500});
     add_thing(*debug_room_things, bug1);
     add_thing(*debug_room_things, bug2);
     add_thing(*debug_room_things, bug3);
-    add_thing(*debug_room_things, tri);
-    add_thing(*debug_room_things, aabb);
-    add_thing(*debug_room_things, poly);
     #if DEV_MODE {
         editor_init();
     }

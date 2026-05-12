@@ -1,25 +1,29 @@
-Editor_Selection :: struct {
+Editor_State :: struct {
     selected_collider_idx: u32;
     selected_entity_idx: u32;
-    entity_data: Editor_Entity_Data;
-    locked: bool;
-}
-
-Editor_Entity_Data :: struct {
     held_entity := false;
     held_entity_idx: u32;
     held_component := false;
     held_entity_component_idx: s32 = -1;
+    action_state := Editor_Action.NIL;
+    locked: bool;
 }
 
-editor_selection: Editor_Selection;
+Editor_Action :: enum {
+    NIL :: 0;
+    MAKE_AABB :: 1;
+    MAKE_TRI :: 2;
+    MAKE_POLY :: 3;
+}
+
+editor_state: Editor_State;
 inspector_subwindow := Get_Rect.Subwindow_Info.{
                                                 rect = #run Get_Rect.get_rect(cast(float32)n_window.width - 610, cast(float32)n_window.height - 810, 600, 800),
                                                 draw = draw_inspector,
                                                 title_text = "Inspector"};
 
 actions_subwindow := Get_Rect.Subwindow_Info.{
-                                              rect = #run Get_Rect.get_rect(cast(float32)n_window.width - 610, cast(float32)n_window.height - 400, 600, 400),
+                                              rect = #run Get_Rect.get_rect(0, cast(float32)n_window.height - 400, 200, 250),
                                               draw = draw_actions,
                                               title_text = "Actions"};
 
@@ -85,7 +89,7 @@ render_editor_ui :: () {
 
     Get_Rect.add_subwindow(*inspector_subwindow, *my_theme.subwindow_theme);
     Get_Rect.add_subwindow(*actions_subwindow, *my_theme.subwindow_theme);
-
+    consume_editor_inputs();
     Get_Rect.draw_popups();
 }
 
@@ -423,30 +427,53 @@ draw_actions :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void
     make_tri_rect := Get_Rect.get_rect(r.x, r.y + r.h - 105, 200, 50);
     make_poly_rect := Get_Rect.get_rect(r.x, r.y + r.h - 160, 200, 50);
 
-    aabb_pressed := Get_Rect.button(make_aabb_rect, "AABB");
-    tri_pressed := Get_Rect.button(make_tri_rect, "Tri");
-    poly_pressed := Get_Rect.button(make_poly_rect, "Polygon");
+    _, _, aabb_released := Get_Rect.button(make_aabb_rect, "AABB");
+    _, _, tri_released := Get_Rect.button(make_tri_rect, "Tri");
+    _, _, poly_released := Get_Rect.button(make_poly_rect, "Polygon");
 
-    if aabb_pressed {
-        aabb := make_collision_aabb_simple(.{600, 600});
-        add_thing(*debug_room_things, aabb);
+    if aabb_released {
+        editor_state.action_state = .MAKE_AABB;
     }
-    if tri_pressed {
-        tri := make_collision_right_tri(.{600, 600});
-        add_thing(*debug_room_things, tri);
+    if tri_released {
+        editor_state.action_state = .MAKE_TRI;
     }
-    if poly_pressed {
-        poly := make_collision_poly_square(.{600, 600});
-        add_thing(*debug_room_things, poly);
+    if poly_released {
+        editor_state.action_state = .MAKE_POLY;
+    }
+}
+
+consume_editor_inputs :: () {
+    if is_action_pressed(.EDITOR_SELECT) {
+        pos := mouse_position_to_world();
+        if editor_state.action_state == {
+        case .MAKE_AABB;
+            aabb := make_collision_aabb_simple(pos);
+            add_thing(*debug_room_things, aabb);
+            editor_state.action_state = .NIL;
+        case .MAKE_TRI;
+            tri := make_collision_right_tri(pos);
+            add_thing(*debug_room_things, tri);
+            editor_state.action_state = .NIL;
+        case .MAKE_POLY;
+            poly := make_collision_poly_square(pos);
+            add_thing(*debug_room_things, poly);
+            editor_state.action_state = .NIL;
+        }
+    }
+
+    if is_action_pressed(.EDITOR_LOCK) {
+        editor_state.locked = true;
+    } else {
+        editor_state.locked = false;
     }
 }
 
 draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
     locked_rect := Get_Rect.get_rect(r.x + r.w - 200, r.y + r.h - 60, 200, 50);
-    pressed := Get_Rect.base_checkbox(locked_rect, "Locked", editor_selection.locked, *my_theme.checkbox_theme);
-    editor_selection.locked ^= pressed;
+    pressed := Get_Rect.base_checkbox(locked_rect, "Locked", editor_state.locked, *my_theme.checkbox_theme);
+    editor_state.locked ^= pressed;
 
-    ent_idx := editor_selection.selected_entity_idx;
+    ent_idx := editor_state.selected_entity_idx;
     entity := get_thing_ptr(*debug_room_things, ent_idx);
 
     label_left_margin := r.x - 5;
