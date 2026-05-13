@@ -53,7 +53,7 @@ Get_Rect :: #import "GetRect";
 #load "window.jai";
 #load "render.jai";
 #load "camera.jai";
-#load "thing.jai";
+#load "thing/core.jai";
 #load "simulate.jai";
 #load "input.jai";
 #load "player.jai";
