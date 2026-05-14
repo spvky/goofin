@@ -68,7 +68,7 @@ angle_between :: (start: Vector2, end: Vector2) -> float32 {
     return atan2(end.y - start.y, end.x - start.x);
 }
 
-render_line :: (start: Vector2, end: Vector2, thickness := 5.0) {
+render_line :: (start: Vector2, end: Vector2, thickness := 5.0, color := Vector4.{0, 0, 0, 0.3}) {
     Simp.set_shader_for_color(true);
     dist := distance(start, end);
     theta := angle_between(start, end);
@@ -85,6 +85,5 @@ render_line :: (start: Vector2, end: Vector2, thickness := 5.0) {
     p2 := center + h - v;
     p3 := center - h - v;
 
-    line_color: Vector4 = .{0, 0, 0, 0.3};
-    Simp.immediate_quad(p0, p1, p2, p3, line_color);
+    Simp.immediate_quad(p0, p1, p2, p3, color);
 }

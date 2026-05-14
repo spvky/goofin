@@ -7,7 +7,7 @@ render_single_thing :: (thing: *Thing) {
         edges := get_shape_edges(thing);
         for e: edges {
             origin := pos + e.center;
-            render_line(origin, origin + (e.normal * 50));
+            render_line(origin, origin + (e.normal * 50), color = .{0.7, 0.5, 0, 1});
         }
         Simp.set_shader_for_color();
         if thing.collision_shape == {

@@ -47,6 +47,7 @@ Get_Rect :: #import "GetRect";
 #import "File";
 #import "Random";
 #import "Input";
+#import "String";
 #import "Window_Creation";
 // #import "Time"(TICK_RATE = 1.0 / 60.0);
 
@@ -54,6 +55,7 @@ Get_Rect :: #import "GetRect";
 #load "render.jai";
 #load "camera.jai";
 #load "thing/core.jai";
+#load "room/core.jai";
 #load "simulate.jai";
 #load "input.jai";
 #load "player.jai";
