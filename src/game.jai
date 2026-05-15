@@ -9,6 +9,10 @@ main :: () {
     init_window();
     init_textures();
     read_room_from_file(*current_room, "assets/rooms/Second.room");
+    for room_list() {
+        _, _, _, filename := path_decomp(it);
+        print("%\n", filename);
+    }
     // current_room.name = copy_string("First");
     // bug1 := make_character(.{100, 100});
     // bug2 := make_character(.{300, 250}, .{10, 0});

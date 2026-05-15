@@ -32,3 +32,7 @@ link_room_textures :: (room: *Room) {
         }
     }
 }
+
+room_list :: () -> []string {
+    return File_Util.file_list("assets/rooms");
+}
