@@ -25,6 +25,10 @@ read_room_from_file :: (room: *Room, path: string) {
     link_room_textures(room);
 }
 
+make_new_room :: () {
+    current_room = Room.{};
+}
+
 link_room_textures :: (room: *Room) {
     for thing: room.things {
         if thing.kind == .CHARACTER {
@@ -34,5 +38,5 @@ link_room_textures :: (room: *Room) {
 }
 
 room_list :: () -> []string {
-    return File_Util.file_list("assets/rooms");
+    return File_Util.file_list("assets/rooms",, temp);
 }

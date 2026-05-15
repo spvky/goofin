@@ -5,7 +5,10 @@ Editor_State :: struct {
     held_entity_idx: u32;
     held_component := false;
     held_entity_component_idx: s32 = -1;
+    load_window_scroll_value: float32;
     action_state := Editor_Action.NIL;
+    current_action_set: s32;
+    room_dirty: bool;
     locked: bool;
 }
 
@@ -17,20 +20,6 @@ Editor_Action :: enum {
 }
 
 editor_state: Editor_State;
-inspector_subwindow := Get_Rect.Subwindow_Info.{
-                                                rect = #run Get_Rect.get_rect(cast(float32)n_window.width - 610, cast(float32)n_window.height - 810, 600, 800),
-                                                draw = draw_inspector,
-                                                title_text = "Inspector"};
-
-actions_subwindow := Get_Rect.Subwindow_Info.{
-                                              rect = #run Get_Rect.get_rect(0, cast(float32)n_window.height - 400, 200, 250),
-                                              draw = draw_actions,
-                                              title_text = "Actions"};
-
-room_subwindow := Get_Rect.Subwindow_Info.{
-                                           rect = #run Get_Rect.get_rect(0, 0, 340, 250),
-                                           draw = draw_room_panel,
-                                           title_text = "Room"};
 
 editor_init :: () {
     load_editor_assets();
@@ -85,7 +74,7 @@ inspector_window: Get_Rect.Subwindow_Info;
 render_editor_ui :: () {
     Simp.set_shader_for_color();
 
-    my_theme.subwindow_theme.title_bar.surface_color = .{1, 0, 0, 1};
+    my_theme.subwindow_theme.title_bar.surface_color = ifx editor_state.room_dirty then Vector4.{1, 0, 0, 1} else Vector4.{.165, .233, .379, 1};
 
     current_time := to_float64_seconds(current_time_monotonic());
     w, h := Simp.get_render_dimensions(n_window.resource);
@@ -94,7 +83,8 @@ render_editor_ui :: () {
 
     Get_Rect.add_subwindow(*inspector_subwindow, *my_theme.subwindow_theme);
     Get_Rect.add_subwindow(*actions_subwindow, *my_theme.subwindow_theme);
-    Get_Rect.add_subwindow(*room_subwindow, *my_theme.subwindow_theme);
+    Get_Rect.add_subwindow(*save_subwindow, *my_theme.subwindow_theme);
+    Get_Rect.add_subwindow(*load_subwindow, *my_theme.subwindow_theme);
     draw_action_cursor();
     consume_editor_inputs();
     Get_Rect.draw_popups();
@@ -429,36 +419,6 @@ draw_collision_data_fields :: (col_shape: Collision_Shape) #expand {
     }
 }
 
-draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
-    locked_rect := Get_Rect.get_rect(r.x + r.w - 200, r.y + r.h - 60, 200, 50);
-    pressed := Get_Rect.base_checkbox(locked_rect, "Locked", editor_state.locked, *my_theme.checkbox_theme);
-    editor_state.locked ^= pressed;
-
-    ent_idx := editor_state.selected_entity_idx;
-    entity := get_thing_ptr(*current_room.things, ent_idx);
-
-    label_left_margin := r.x - 5;
-    text_left_margin := r.x + 30;
-    y_pos := r.y + r.h - 60;
-
-    label_extents := Vector2.{600, 35};
-    text_extents := Vector2.{150, 35};
-    field_index: s64;
-
-    if entity.kind == {
-    case .CHARACTER;
-        draw_character_data_fields();
-    case .COLLISION;
-        col_shape := entity.collision_shape;
-        draw_collision_data_fields(col_shape);
-    }
-
-    mouse_pos := mouse_position_to_world();
-    pos_label := Get_Rect.get_rect(r.x - 10, r.y - 20, 400, 80);
-    mouse_x, mouse_y := float_fmt(mouse_pos.x), float_fmt(mouse_pos.y);
-    Get_Rect.label(pos_label, tprint("{%, %}", mouse_x, mouse_y), *my_theme.label_theme);
-}
-
 modify_float_from_string :: (value_ptr: *float32, float_str: string) -> success: bool {
     new_value, ok := parse_float(*float_str);
     if ok {
@@ -477,26 +437,6 @@ modify_string :: (ps: *string, new_value: string) {
 // Formats a float and returns the resultant string, using the temporary allocator
 float_str :: (f: float32) -> string {
     return tprint("%", formatFloat(f, 2, 0, zero_removal = .NO));
-}
-
-draw_actions :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
-    make_aabb_rect := Get_Rect.get_rect(r.x, r.y + r.h - 50, 200, 50);
-    make_tri_rect := Get_Rect.get_rect(r.x, r.y + r.h - 105, 200, 50);
-    make_poly_rect := Get_Rect.get_rect(r.x, r.y + r.h - 160, 200, 50);
-
-    _, _, aabb_released := Get_Rect.button(make_aabb_rect, "AABB");
-    _, _, tri_released := Get_Rect.button(make_tri_rect, "Tri");
-    _, _, poly_released := Get_Rect.button(make_poly_rect, "Polygon");
-
-    if aabb_released {
-        editor_state.action_state = .MAKE_AABB;
-    }
-    if tri_released {
-        editor_state.action_state = .MAKE_TRI;
-    }
-    if poly_released {
-        editor_state.action_state = .MAKE_POLY;
-    }
 }
 
 draw_action_cursor :: () {
@@ -531,14 +471,17 @@ consume_editor_inputs :: () {
             aabb := make_collision_aabb_simple(pos);
             add_thing(*current_room.things, aabb);
             editor_state.action_state = .NIL;
+            editor_state.room_dirty = true;
         case .MAKE_TRI;
             tri := make_collision_right_tri(pos);
             add_thing(*current_room.things, tri);
             editor_state.action_state = .NIL;
+            editor_state.room_dirty = true;
         case .MAKE_POLY;
             poly := make_collision_poly_square(pos);
             add_thing(*current_room.things, poly);
             editor_state.action_state = .NIL;
+            editor_state.room_dirty = true;
         }
     }
 
@@ -547,17 +490,6 @@ consume_editor_inputs :: () {
     } else {
         editor_state.locked = false;
     }
-}
-
-draw_room_panel :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
-    text_extents := Vector2.{300, 50};
-    room_name_rect := Get_Rect.get_rect(r.x + 20, r.y + r.h - 80, text_extents.x, text_extents.y);
-    room_name_action, new_room_name, room_name_state := Get_Rect.text_input(room_name_rect, current_room.name, *my_theme.text_input_theme);
-    if room_name_action & .ENTERED modify_string(*current_room.name, new_room_name);
-
-    save_button_rect := Get_Rect.get_rect(r.x + 20, r.y + r.h - 120, 145, 50);
-    _, _, save_released := Get_Rect.button(save_button_rect, "Save");
-    if save_released save_room_to_file(*current_room);
 }
 
 Editor_Assets :: struct {
@@ -571,4 +503,4 @@ load_editor_assets :: () {
     assert(editor_assets.font != null);
 }
 
-File_Util :: #import "File_Utilities";
+#load "subwindows.jai";
