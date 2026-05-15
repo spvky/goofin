@@ -14,14 +14,21 @@ save_room_to_file :: (room: *Room) {
 }
 
 // Read room from file
-read_room_from_file :: (path: string) -> Room {
+read_room_from_file :: (room: *Room, path: string) {
     file, ok := file_open(path);
     assert(ok, "Failed to open % for reading!\n", path);
     defer file_close(*file);
 
-    room: Room;
     dir, name, extension := path_decomp(path);
     room.name = copy_string(name);
     file_read(file, *room.things, size_of(Thing_Room_Manager));
-    return room;
+    link_room_textures(room);
+}
+
+link_room_textures :: (room: *Room) {
+    for thing: room.things {
+        if thing.kind == .CHARACTER {
+            thing.map = *bug_tex;
+        }
+    }
 }

@@ -429,6 +429,56 @@ draw_collision_data_fields :: (col_shape: Collision_Shape) #expand {
     }
 }
 
+draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
+    locked_rect := Get_Rect.get_rect(r.x + r.w - 200, r.y + r.h - 60, 200, 50);
+    pressed := Get_Rect.base_checkbox(locked_rect, "Locked", editor_state.locked, *my_theme.checkbox_theme);
+    editor_state.locked ^= pressed;
+
+    ent_idx := editor_state.selected_entity_idx;
+    entity := get_thing_ptr(*current_room.things, ent_idx);
+
+    label_left_margin := r.x - 5;
+    text_left_margin := r.x + 30;
+    y_pos := r.y + r.h - 60;
+
+    label_extents := Vector2.{600, 35};
+    text_extents := Vector2.{150, 35};
+    field_index: s64;
+
+    if entity.kind == {
+    case .CHARACTER;
+        draw_character_data_fields();
+    case .COLLISION;
+        col_shape := entity.collision_shape;
+        draw_collision_data_fields(col_shape);
+    }
+
+    mouse_pos := mouse_position_to_world();
+    pos_label := Get_Rect.get_rect(r.x - 10, r.y - 20, 400, 80);
+    mouse_x, mouse_y := float_fmt(mouse_pos.x), float_fmt(mouse_pos.y);
+    Get_Rect.label(pos_label, tprint("{%, %}", mouse_x, mouse_y), *my_theme.label_theme);
+}
+
+modify_float_from_string :: (value_ptr: *float32, float_str: string) -> success: bool {
+    new_value, ok := parse_float(*float_str);
+    if ok {
+        value_ptr.* = new_value;
+    } else {
+        assert(false, "Unable to parse float from string '%'", float_str);
+    }
+    return ok;
+}
+
+modify_string :: (ps: *string, new_value: string) {
+    free(ps.*);
+    ps.* = copy_string(new_value);
+}
+
+// Formats a float and returns the resultant string, using the temporary allocator
+float_str :: (f: float32) -> string {
+    return tprint("%", formatFloat(f, 2, 0, zero_removal = .NO));
+}
+
 draw_actions :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
     make_aabb_rect := Get_Rect.get_rect(r.x, r.y + r.h - 50, 200, 50);
     make_tri_rect := Get_Rect.get_rect(r.x, r.y + r.h - 105, 200, 50);
@@ -499,61 +549,15 @@ consume_editor_inputs :: () {
     }
 }
 
-draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
-    locked_rect := Get_Rect.get_rect(r.x + r.w - 200, r.y + r.h - 60, 200, 50);
-    pressed := Get_Rect.base_checkbox(locked_rect, "Locked", editor_state.locked, *my_theme.checkbox_theme);
-    editor_state.locked ^= pressed;
-
-    ent_idx := editor_state.selected_entity_idx;
-    entity := get_thing_ptr(*current_room.things, ent_idx);
-
-    label_left_margin := r.x - 5;
-    text_left_margin := r.x + 30;
-    y_pos := r.y + r.h - 60;
-
-    label_extents := Vector2.{600, 35};
-    text_extents := Vector2.{150, 35};
-    field_index: s64;
-
-    if entity.kind == {
-    case .CHARACTER;
-        draw_character_data_fields();
-    case .COLLISION;
-        col_shape := entity.collision_shape;
-        draw_collision_data_fields(col_shape);
-    }
-
-    mouse_pos := mouse_position_to_world();
-    pos_label := Get_Rect.get_rect(r.x - 10, r.y - 20, 400, 80);
-    mouse_x, mouse_y := float_fmt(mouse_pos.x), float_fmt(mouse_pos.y);
-    Get_Rect.label(pos_label, tprint("{%, %}", mouse_x, mouse_y), *my_theme.label_theme);
-}
-
-modify_float_from_string :: (value_ptr: *float32, float_str: string) -> success: bool {
-    new_value, ok := parse_float(*float_str);
-    if ok {
-        value_ptr.* = new_value;
-    } else {
-        assert(false, "Unable to parse float from string '%'", float_str);
-    }
-    return ok;
-}
-
-modify_string :: (ps: *string, new_value: string) {
-    free(ps.*);
-    ps.* = copy_string(new_value);
-}
-
-// Formats a float and returns the resultant string, using the temporary allocator
-float_str :: (f: float32) -> string {
-    return tprint("%", formatFloat(f, 2, 0, zero_removal = .NO));
-}
-
 draw_room_panel :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
     text_extents := Vector2.{300, 50};
     room_name_rect := Get_Rect.get_rect(r.x + 20, r.y + r.h - 80, text_extents.x, text_extents.y);
     room_name_action, new_room_name, room_name_state := Get_Rect.text_input(room_name_rect, current_room.name, *my_theme.text_input_theme);
     if room_name_action & .ENTERED modify_string(*current_room.name, new_room_name);
+
+    save_button_rect := Get_Rect.get_rect(r.x + 20, r.y + r.h - 120, 145, 50);
+    _, _, save_released := Get_Rect.button(save_button_rect, "Save");
+    if save_released save_room_to_file(*current_room);
 }
 
 Editor_Assets :: struct {

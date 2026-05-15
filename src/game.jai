@@ -8,12 +8,14 @@ getrect_captured_keyboard: bool;
 main :: () {
     init_window();
     init_textures();
-    bug1 := make_character(.{100, 100});
-    bug2 := make_character(.{300, 250}, .{10, 0});
-    bug3 := make_character(.{600, 250});
-    add_thing(*current_room.things, bug1);
-    add_thing(*current_room.things, bug2);
-    add_thing(*current_room.things, bug3);
+    read_room_from_file(*current_room, "assets/rooms/Second.room");
+    // current_room.name = copy_string("First");
+    // bug1 := make_character(.{100, 100});
+    // bug2 := make_character(.{300, 250}, .{10, 0});
+    // bug3 := make_character(.{600, 250});
+    // add_thing(*current_room.things, bug1);
+    // add_thing(*current_room.things, bug2);
+    // add_thing(*current_room.things, bug3);
     #if DEV_MODE {
         editor_init();
     }
