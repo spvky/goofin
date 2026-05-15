@@ -17,7 +17,7 @@ simulate :: (delta: float32) {
     apply_thing_velocity(delta);
     #if DEV_MODE {
         if editor_mode {
-            thing_editor_picking(*debug_room_things);
+            thing_editor_picking(*current_room.things);
         }
     }
 }

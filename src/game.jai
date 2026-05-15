@@ -11,9 +11,9 @@ main :: () {
     bug1 := make_character(.{100, 100});
     bug2 := make_character(.{300, 250}, .{10, 0});
     bug3 := make_character(.{600, 250});
-    add_thing(*debug_room_things, bug1);
-    add_thing(*debug_room_things, bug2);
-    add_thing(*debug_room_things, bug3);
+    add_thing(*current_room.things, bug1);
+    add_thing(*current_room.things, bug2);
+    add_thing(*current_room.things, bug3);
     #if DEV_MODE {
         editor_init();
     }

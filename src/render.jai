@@ -21,7 +21,7 @@ render :: () {
     #if DEV_MODE {
         render_editor_grid();
     }
-    render_things_in_room(debug_room_things);
+    render_things_in_room(current_room.things);
     #if DEV_MODE {
         if editor_mode {
             render_editor_ui();

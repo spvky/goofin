@@ -6,8 +6,6 @@ Thing_Room_Manager :: struct {
     next_free: int = 0;
 }
 
-debug_room_things: Thing_Room_Manager;
-
 for_expansion :: (tm: *Thing_Room_Manager, body: Code, flags: For_Flags) #expand {
     for ok, i: tm.used {
         if !ok continue;

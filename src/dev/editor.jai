@@ -27,6 +27,11 @@ actions_subwindow := Get_Rect.Subwindow_Info.{
                                               draw = draw_actions,
                                               title_text = "Actions"};
 
+room_subwindow := Get_Rect.Subwindow_Info.{
+                                           rect = #run Get_Rect.get_rect(0, 0, 340, 250),
+                                           draw = draw_room_panel,
+                                           title_text = "Room"};
+
 editor_init :: () {
     load_editor_assets();
     Get_Rect.ui_init();
@@ -89,6 +94,8 @@ render_editor_ui :: () {
 
     Get_Rect.add_subwindow(*inspector_subwindow, *my_theme.subwindow_theme);
     Get_Rect.add_subwindow(*actions_subwindow, *my_theme.subwindow_theme);
+    Get_Rect.add_subwindow(*room_subwindow, *my_theme.subwindow_theme);
+    draw_action_cursor();
     consume_editor_inputs();
     Get_Rect.draw_popups();
 }
@@ -442,21 +449,45 @@ draw_actions :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void
     }
 }
 
+draw_action_cursor :: () {
+    pos := mouse_pos();
+    Simp.set_shader_for_color(true);
+    if editor_state.action_state == {
+    case .MAKE_AABB;
+        p0 := pos + .{-50, 50};
+        p1 := pos + .{-50, -50};
+        p2 := pos + .{50, -50};
+        p3 := pos + .{50, 50};
+        Simp.immediate_quad(p0, p1, p2, p3, .{0, 0, 0.7, 0.5});
+    case .MAKE_TRI;
+        p0 := pos + .{-50, 50};
+        p1 := pos + .{-50, -50};
+        p2 := pos + .{50, -50};
+        Simp.immediate_quad(p0, p0, p1, p2, .{0, 0.7, 0, 0.5});
+    case .MAKE_POLY;
+        p0 := pos + .{-50, 50};
+        p1 := pos + .{-50, -50};
+        p2 := pos + .{50, -50};
+        p3 := pos + .{50, 50};
+        Simp.immediate_quad(p0, p1, p2, p3, .{0.7, 0, 0, 0.5});
+    }
+}
+
 consume_editor_inputs :: () {
     if is_action_pressed(.EDITOR_SELECT) {
         pos := mouse_position_to_world();
         if editor_state.action_state == {
         case .MAKE_AABB;
             aabb := make_collision_aabb_simple(pos);
-            add_thing(*debug_room_things, aabb);
+            add_thing(*current_room.things, aabb);
             editor_state.action_state = .NIL;
         case .MAKE_TRI;
             tri := make_collision_right_tri(pos);
-            add_thing(*debug_room_things, tri);
+            add_thing(*current_room.things, tri);
             editor_state.action_state = .NIL;
         case .MAKE_POLY;
             poly := make_collision_poly_square(pos);
-            add_thing(*debug_room_things, poly);
+            add_thing(*current_room.things, poly);
             editor_state.action_state = .NIL;
         }
     }
@@ -474,7 +505,7 @@ draw_inspector :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *vo
     editor_state.locked ^= pressed;
 
     ent_idx := editor_state.selected_entity_idx;
-    entity := get_thing_ptr(*debug_room_things, ent_idx);
+    entity := get_thing_ptr(*current_room.things, ent_idx);
 
     label_left_margin := r.x - 5;
     text_left_margin := r.x + 30;
@@ -508,9 +539,21 @@ modify_float_from_string :: (value_ptr: *float32, float_str: string) -> success:
     return ok;
 }
 
+modify_string :: (ps: *string, new_value: string) {
+    free(ps.*);
+    ps.* = copy_string(new_value);
+}
+
 // Formats a float and returns the resultant string, using the temporary allocator
 float_str :: (f: float32) -> string {
     return tprint("%", formatFloat(f, 2, 0, zero_removal = .NO));
+}
+
+draw_room_panel :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
+    text_extents := Vector2.{300, 50};
+    room_name_rect := Get_Rect.get_rect(r.x + 20, r.y + r.h - 80, text_extents.x, text_extents.y);
+    room_name_action, new_room_name, room_name_state := Get_Rect.text_input(room_name_rect, current_room.name, *my_theme.text_input_theme);
+    if room_name_action & .ENTERED modify_string(*current_room.name, new_room_name);
 }
 
 Editor_Assets :: struct {

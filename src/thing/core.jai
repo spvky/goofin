@@ -51,7 +51,7 @@ get_collision_vertex_collection :: (thing: *Thing) -> []Vector2 {
 }
 
 apply_thing_velocity :: (delta: float32) {
-    for *t: debug_room_things {
+    for *t: current_room.things {
         if t.kind == .CHARACTER {
             t.position += t.velocity * delta;
         }
