@@ -17,6 +17,7 @@ Editor_Action :: enum {
     MAKE_AABB :: 1;
     MAKE_TRI :: 2;
     MAKE_POLY :: 3;
+    MAKE_ENTITY :: 4;
 }
 
 editor_state: Editor_State;
@@ -480,6 +481,11 @@ consume_editor_inputs :: () {
         case .MAKE_POLY;
             poly := make_collision_poly_square(pos);
             add_thing(*current_room.things, poly);
+            editor_state.action_state = .NIL;
+            editor_state.room_dirty = true;
+        case .MAKE_ENTITY;
+            entity := make_character(pos);
+            add_thing(*current_room.things, entity);
             editor_state.action_state = .NIL;
             editor_state.room_dirty = true;
         }

@@ -54,15 +54,16 @@ draw_inspector_panel :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, dat
 
 draw_actions_panel :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data: *void) {
     dropdown_rect := Get_Rect.get_rect(r.x, r.y + r.h - 50, 200, 50);
-    make_aabb_rect := Get_Rect.get_rect(r.x, r.y + r.h - 105, 200, 50);
-    make_tri_rect := Get_Rect.get_rect(r.x, r.y + r.h - 160, 200, 50);
-    make_poly_rect := Get_Rect.get_rect(r.x, r.y + r.h - 215, 200, 50);
+    rect1 := Get_Rect.get_rect(r.x, r.y + r.h - 105, 200, 50);
+    rect2 := Get_Rect.get_rect(r.x, r.y + r.h - 160, 200, 50);
+    rect3 := Get_Rect.get_rect(r.x, r.y + r.h - 215, 200, 50);
 
     Get_Rect.dropdown(dropdown_rect, ACTION_OPTIONS, *editor_state.current_action_set);
-    if editor_state.current_action_set == 0 {
-        _, _, aabb_released := Get_Rect.button(make_aabb_rect, "AABB");
-        _, _, tri_released := Get_Rect.button(make_tri_rect, "Tri");
-        _, _, poly_released := Get_Rect.button(make_poly_rect, "Polygon");
+    if editor_state.current_action_set == {
+    case 0;
+        _, _, aabb_released := Get_Rect.button(rect1, "AABB");
+        _, _, tri_released := Get_Rect.button(rect2, "Tri");
+        _, _, poly_released := Get_Rect.button(rect3, "Polygon");
         if aabb_released {
             editor_state.action_state = .MAKE_AABB;
         }
@@ -71,6 +72,12 @@ draw_actions_panel :: (state: *Get_Rect.Subwindow_State, r: Get_Rect.Rect, data:
         }
         if poly_released {
             editor_state.action_state = .MAKE_POLY;
+        }
+
+    case 1;
+        _, _, entity_released := Get_Rect.button(rect1, "Entity");
+        if entity_released {
+            editor_state.action_state = .MAKE_ENTITY;
         }
     }
 }

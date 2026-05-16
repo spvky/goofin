@@ -14,7 +14,6 @@ Thing_Kind :: enum {
 Character_Data :: struct @thing_data {
     velocity: Vector2; @editor_display
     size := Vector2.{100, 100}; @editor_display
-    farts: Vector2; @editor_display
     map: *Texture;
 }
 
